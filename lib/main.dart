@@ -20,9 +20,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Login App',
+      title: 'ticke.it',
       theme: ThemeData(primarySwatch: Colors.blue),
-      debugShowCheckedModeBanner: false, // Remove o banner "DEBUG"
+      debugShowCheckedModeBanner: false,
       home: const LoginScreen(),
     );
   }
