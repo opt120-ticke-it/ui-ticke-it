@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ticke_it/models/user.dart';
 import 'package:ticke_it/providers/user_provider.dart';
+import 'package:ticke_it/screens/signup_screen.dart';
+import 'dart:convert';
+import 'package:ticke_it/services/auth_services.dart';
+import 'package:ticke_it/screens/home_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -18,33 +22,41 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   bool _obscurePassword = true;
 
-  void _login(BuildContext context) async {
-    if (_formKey.currentState?.validate() ?? false) {
-      setState(() {
-        _isLoading = true;
-      });
+void _login(BuildContext context) async {
+  if (_formKey.currentState?.validate() ?? false) {
+    setState(() {
+      _isLoading = true;
+    });
 
-      await Future.delayed(const Duration(seconds: 2));
-
-      Provider.of<UserProvider>(context, listen: false).setUserFromModel(
-        User(
-          id: '',
-          name: "John Doe",
-          email: _emailController.text,
-          password: _passwordController.text,
-          userType: UserType.CLIENTE,
-        ),
+    try {
+      final Map<String, dynamic> responseData = await AuthService.login(
+        email: _emailController.text,
+        password: _passwordController.text,
       );
-
-      setState(() {
-        _isLoading = false;
-      });
+      final token = responseData['token'];
 
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Login realizado com sucesso!')),
       );
+
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => HomeScreen()),
+      );
+
+    } catch (e) {
+      print('Erro no login: $e');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
+}
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -58,13 +70,12 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Logo and Title
                 Center(
                   child: Column(
                     children: [
                       const SizedBox(height: 16),
                       Text(
-                        'Bem-vindo ao Ticke.it',
+                        'Bem-vindo ao ticke.it!',
                         style:
                             Theme.of(context).textTheme.headlineSmall?.copyWith(
                                   fontWeight: FontWeight.bold,
@@ -81,16 +92,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                 ),
-
                 const SizedBox(height: 40),
-
-                // Login Form
                 Form(
                   key: _formKey,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      // Email Input
                       TextFormField(
                         controller: _emailController,
                         decoration: InputDecoration(
@@ -115,8 +122,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
 
                       const SizedBox(height: 16),
-
-                      // Password Input
                       TextFormField(
                         controller: _passwordController,
                         decoration: InputDecoration(
@@ -152,8 +157,6 @@ class _LoginScreenState extends State<LoginScreen> {
                           return null;
                         },
                       ),
-
-                      // Forgot Password
                       Align(
                         alignment: Alignment.centerRight,
                         child: TextButton(
@@ -168,8 +171,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
 
                       const SizedBox(height: 24),
-
-                      // Login Button
                       ElevatedButton(
                         onPressed: _isLoading ? null : () => _login(context),
                         style: ElevatedButton.styleFrom(
@@ -199,8 +200,6 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
 
                       const SizedBox(height: 24),
-
-                      // Sign Up Option
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
@@ -210,7 +209,12 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           GestureDetector(
                             onTap: () {
-                              // Navegar para a tela de cadastro
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => RegisterScreen()
+                                )
+                              );
                             },
                             child: Text(
                               'Cadastre-se',
