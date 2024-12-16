@@ -4,7 +4,7 @@ import 'package:ticke_it/models/user.dart';
 
 class AuthService {
   // FAZER UM ARQUIVO PARA ARMAZENAR A URL BASE
-  static const String _baseUrl = 'http://172.24.176.1:3000';
+  static const String _baseUrl = 'http://172.21.192.1:3000';
 
   static Future<Map<String, dynamic>> register({
     required String name,
@@ -13,7 +13,7 @@ class AuthService {
     required UserType userType,
   }) async {
     final response = await http.post(
-      Uri.parse('${_baseUrl}/users/registrar'),
+      Uri.parse('${_baseUrl}/user/registrar'),
       headers: {
         'Content-Type': 'application/json',
       },

@@ -10,20 +10,35 @@ class UserProvider extends ChangeNotifier {
     userType: UserType.CLIENTE,
   );
 
+  String? _token; // Token opcional, usado para autenticação.
+
   User get user => _user;
+  String? get token => _token; // Getter para o token.
 
-  void setUser(String user) {
-    _user = User.fromJson(user);
+  // Define os dados do usuário e o token.
+  void setUser(String userJson, {String? token}) {
+    _user = User.fromJson(userJson);
+    _token = token;
     notifyListeners();
   }
 
-  void setUserFromModel(User user) {
+  // Define o usuário diretamente a partir de um modelo.
+  void setUserFromModel(User user, {String? token}) {
     _user = user;
+    _token = token;
     notifyListeners();
   }
 
-  // void updateUser(User newUser) {
-  //   user = newUser;
-  //   notifyListeners();
-  // }
+  // Redefine o estado do usuário e limpa o token ao fazer logout.
+  void logout() {
+    _user = User(
+      name: '',
+      id: '',
+      email: '',
+      password: '',
+      userType: UserType.CLIENTE,
+    );
+    _token = null;
+    notifyListeners();
+  }
 }
