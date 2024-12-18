@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ticke_it/providers/user_provider.dart';
-import 'package:ticke_it/screens/home_screen.dart';
 import 'package:ticke_it/screens/login_screen.dart';
-import 'package:ticke_it/widgets/Eventcard.dart';
 
 void main() {
   runApp(
@@ -25,7 +23,7 @@ class MyApp extends StatelessWidget {
       title: 'ticke.it',
       theme: ThemeData(primarySwatch: Colors.blue),
       debugShowCheckedModeBanner: false,
-      home: HomeScreen(),
+      home: const LoginScreen(),
     );
   }
 }
