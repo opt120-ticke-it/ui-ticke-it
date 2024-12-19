@@ -1,21 +1,18 @@
 // ignore: constant_identifier_names
 import 'dart:convert';
 
-enum UserType { CLIENTE, ORGANIZADOR, FUNCIONARIO }
 
 class User {
   final String id;
   final String name;
   final String email;
   final String password;
-  final UserType userType;
 
   User({
     required this.id,
     required this.name,
     required this.email,
     required this.password,
-    required this.userType,
   });
 
   factory User.fromMap(Map<String, dynamic> map) {
@@ -24,7 +21,6 @@ class User {
       name: map['name'],
       email: map['email'],
       password: map['password'],
-      userType: UserType.values.firstWhere((e) => e.name == map['userType']),
     );
   }
 
@@ -34,7 +30,6 @@ class User {
       'name': name,
       'email': email,
       'password': password,
-      'userType': userType.name,
     };
   }
 

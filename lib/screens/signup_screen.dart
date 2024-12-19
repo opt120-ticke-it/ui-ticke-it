@@ -18,7 +18,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
-  UserType _selectedUserType = UserType.CLIENTE;
 
 
   bool _isLoading = false;
@@ -36,7 +35,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
           name: _nameController.text,
           email: _emailController.text,
           password: _passwordController.text,
-          userType: _selectedUserType,
         );
         Provider.of<UserProvider>(context, listen: false).setUserFromModel(
           User(
@@ -44,7 +42,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
             name: _nameController.text,
             email: _emailController.text,
             password: _passwordController.text,
-            userType: _selectedUserType,
           )
         );
 
@@ -150,31 +147,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             return 'Por favor, insira um email válido.';
                           }
                           return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-
-                      DropdownButtonFormField<UserType>(
-                        value: _selectedUserType,
-                        decoration: InputDecoration(
-                          labelText: 'Tipo de Usuário',
-                          prefixIcon: const Icon(Icons.person_pin_outlined),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          filled: true,
-                          fillColor: Colors.grey[100],
-                        ),
-                        items: UserType.values.map((UserType userType) {
-                          return DropdownMenuItem<UserType>(
-                            value: userType,
-                            child: Text(_getUserTypeLabel(userType)),
-                          );
-                        }).toList(),
-                        onChanged: (UserType? newValue) {
-                          setState(() {
-                            _selectedUserType = newValue!;
-                          });
                         },
                       ),
                       const SizedBox(height: 16),
@@ -310,16 +282,5 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
       ),
     );
-  }
-
-  String _getUserTypeLabel(UserType userType) {
-    switch (userType) {
-      case UserType.CLIENTE:
-        return 'Cliente';
-      case UserType.ORGANIZADOR:
-        return 'Organizador';
-      case UserType.FUNCIONARIO:
-        return 'Funcionário';
-    }
   }
 }

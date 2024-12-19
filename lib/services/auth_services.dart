@@ -15,7 +15,6 @@ class AuthService {
     required String name,
     required String email,
     required String password,
-    required UserType userType,
   }) async {
     final response = await http.post(
       Uri.parse('${_baseUrl}/user/registrar'),
@@ -26,7 +25,6 @@ class AuthService {
         'name': name,
         'email': email,
         'password': password,
-        'userType': userType.name,
       }),
     );
 

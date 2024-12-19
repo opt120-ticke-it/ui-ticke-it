@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:ticke_it/screens/event_screen.dart';
+import 'package:ticke_it/services/auth_services.dart';
+import 'package:ticke_it/screens/home_screen.dart';
+
 
 class MenuDrawer extends StatelessWidget {
   const MenuDrawer({super.key});
@@ -24,10 +27,17 @@ class MenuDrawer extends StatelessWidget {
             ),
           ),
           ListTile(
+            leading: const Icon(Icons.home),
+            title: const Text('Home'),
+            onTap: () =>Navigator.of(context).pushReplacement(MaterialPageRoute(
+                  builder: (ctx) => HomeScreen()))
+            ,
+          ),
+          ListTile(
             leading: const Icon(Icons.event),
             title: const Text('Meus Eventos'),
             onTap: () =>Navigator.of(context).pushReplacement(MaterialPageRoute(
-                  builder: (ctx) => EventRegistrationScreen()))
+                  builder: (ctx) => EventScreen()))
             ,
           ),
           ListTile(
@@ -69,7 +79,7 @@ class MenuDrawer extends StatelessWidget {
             leading: const Icon(Icons.logout),
             title: const Text('Logout'),
             onTap: () {
-              // Ação para "Logout"
+              AuthService.logout(context);
             },
           ),
         ],

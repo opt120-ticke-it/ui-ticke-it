@@ -26,6 +26,12 @@ class Header extends StatelessWidget implements PreferredSizeWidget {
         ),
       ),
       centerTitle: true,
+      leading: IconButton(
+        icon: const Icon(Icons.menu),
+        iconSize: 28,
+        color: Colors.white,
+        onPressed: onMenuPressed,
+      ),
       actions: [
         IconButton(
           icon: const Icon(Icons.shopping_cart),

@@ -25,7 +25,7 @@ class MyApp extends StatelessWidget {
       title: 'ticke.it',
       theme: ThemeData(primarySwatch: Colors.blue),
       debugShowCheckedModeBanner: false,
-      home: HomeScreen(),
+      home: LoginScreen(),
     );
   }
 }
