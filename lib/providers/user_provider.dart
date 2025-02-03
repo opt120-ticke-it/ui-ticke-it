@@ -7,7 +7,6 @@ class UserProvider extends ChangeNotifier {
     id: '',
     email: '',
     password: '',
-    userType: UserType.CLIENTE,
   );
 
   String? _token; // Token opcional, usado para autenticação.
@@ -36,7 +35,6 @@ class UserProvider extends ChangeNotifier {
       id: '',
       email: '',
       password: '',
-      userType: UserType.CLIENTE,
     );
     _token = null;
     notifyListeners();

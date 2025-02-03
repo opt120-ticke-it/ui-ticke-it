@@ -17,9 +17,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
-  UserType _selectedUserType = UserType.CLIENTE;
-
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
   bool _isLoading = false;
   bool _obscurePassword = true;
@@ -36,17 +35,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
           name: _nameController.text,
           email: _emailController.text,
           password: _passwordController.text,
-          userType: _selectedUserType,
         );
-        Provider.of<UserProvider>(context, listen: false).setUserFromModel(
-          User(
-            id: response['id']?.toString() ?? '',
-            name: _nameController.text,
-            email: _emailController.text,
-            password: _passwordController.text,
-            userType: _selectedUserType,
-          )
-        );
+        Provider.of<UserProvider>(context, listen: false).setUserFromModel(User(
+          id: response['id']?.toString() ?? '',
+          name: _nameController.text,
+          email: _emailController.text,
+          password: _passwordController.text,
+        ));
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Cadastro realizado com sucesso!')),
@@ -76,7 +71,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -86,10 +82,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       const SizedBox(height: 16),
                       Text(
                         'Crie sua Conta',
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
                       ),
                       const SizedBox(height: 8),
                       Text(
@@ -129,7 +126,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         },
                       ),
                       const SizedBox(height: 16),
-
                       TextFormField(
                         controller: _emailController,
                         decoration: InputDecoration(
@@ -150,31 +146,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             return 'Por favor, insira um email válido.';
                           }
                           return null;
-                        },
-                      ),
-                      const SizedBox(height: 16),
-
-                      DropdownButtonFormField<UserType>(
-                        value: _selectedUserType,
-                        decoration: InputDecoration(
-                          labelText: 'Tipo de Usuário',
-                          prefixIcon: const Icon(Icons.person_pin_outlined),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          filled: true,
-                          fillColor: Colors.grey[100],
-                        ),
-                        items: UserType.values.map((UserType userType) {
-                          return DropdownMenuItem<UserType>(
-                            value: userType,
-                            child: Text(_getUserTypeLabel(userType)),
-                          );
-                        }).toList(),
-                        onChanged: (UserType? newValue) {
-                          setState(() {
-                            _selectedUserType = newValue!;
-                          });
                         },
                       ),
                       const SizedBox(height: 16),
@@ -228,7 +199,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                             onPressed: () {
                               setState(() {
-                                _obscureConfirmPassword = !_obscureConfirmPassword;
+                                _obscureConfirmPassword =
+                                    !_obscureConfirmPassword;
                               });
                             },
                           ),
@@ -249,9 +221,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           return null;
                         },
                       ),
-                      
                       const SizedBox(height: 24),
-
                       ElevatedButton(
                         onPressed: _isLoading ? null : () => _register(context),
                         style: ElevatedButton.styleFrom(
@@ -310,16 +280,5 @@ class _RegisterScreenState extends State<RegisterScreen> {
         ),
       ),
     );
-  }
-
-  String _getUserTypeLabel(UserType userType) {
-    switch (userType) {
-      case UserType.CLIENTE:
-        return 'Cliente';
-      case UserType.ORGANIZADOR:
-        return 'Organizador';
-      case UserType.FUNCIONARIO:
-        return 'Funcionário';
-    }
   }
 }

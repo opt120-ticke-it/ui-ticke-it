@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';  // Necessário para o uso do BuildContext e AlertDialog
+import 'package:flutter/material.dart'; // Necessário para o uso do BuildContext e AlertDialog
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:provider/provider.dart'; // Importando o Provider
@@ -8,14 +8,13 @@ import 'package:ticke_it/screens/login_screen.dart'; // Importando a tela de log
 
 class AuthService {
   // FAZER UM ARQUIVO PARA ARMAZENAR A URL BASE
-  static const String _baseUrl = 'http://172.24.176.1:3000';
+  static const String _baseUrl = 'http://localhost:3000';
 
   // Função de registro
   static Future<Map<String, dynamic>> register({
     required String name,
     required String email,
     required String password,
-    required UserType userType,
   }) async {
     final response = await http.post(
       Uri.parse('${_baseUrl}/user/registrar'),
@@ -26,7 +25,6 @@ class AuthService {
         'name': name,
         'email': email,
         'password': password,
-        'userType': userType.name,
       }),
     );
 
@@ -87,7 +85,8 @@ class AuthService {
                   MaterialPageRoute(builder: (_) => const LoginScreen()),
                 );
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Logout realizado com sucesso!')),
+                  const SnackBar(
+                      content: Text('Logout realizado com sucesso!')),
                 );
               },
               child: const Text('Sair'),
