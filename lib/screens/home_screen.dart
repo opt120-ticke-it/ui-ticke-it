@@ -1,30 +1,59 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:ticke_it/providers/user_provider.dart';
-import 'package:ticke_it/screens/login_screen.dart';
-import 'package:ticke_it/widgets/header.dart';
-import 'package:ticke_it/services/auth_services.dart';
+import 'package:ticke_it/components/category_widget.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:ticke_it/components/menu_drawer.dart';
+import 'package:ticke_it/widgets/header.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
   HomeScreen({super.key});
+
+  @override
+  _HomeScreenState createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  List categories = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchCategories();
+  }
+
+  Future<void> fetchCategories() async {
+    final response = await http.get(Uri.parse('http://localhost:3000/category/events/list'));
+    if (response.statusCode == 200) {
+      setState(() {
+        categories = json.decode(response.body);
+      });
+    } else {
+      throw Exception('Failed to load categories');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: scaffoldKey,
+      key: widget.scaffoldKey,
       appBar: Header(
         onMenuPressed: () {
-          scaffoldKey.currentState?.openDrawer();
+          widget.scaffoldKey.currentState?.openDrawer();
         },
         onCartPressed: () {
           print('Carrinho pressionado');
         },
       ),
       drawer: const MenuDrawer(),
-      body: Center(
-        child: Text('Conteúdo da Tela Home'),
-      ),
+      body: categories.isEmpty
+          ? Center(child: CircularProgressIndicator())
+          : ListView.builder(
+              itemCount: categories.length,
+              itemBuilder: (context, index) {
+                return CategoryWidget(category: categories[index]);
+              },
+            ),
     );
   }
 }
