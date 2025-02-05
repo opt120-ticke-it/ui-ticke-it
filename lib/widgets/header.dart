@@ -16,8 +16,9 @@ class Header extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: const Text(
-        'ticke.it',
+      iconTheme: const IconThemeData(color: Colors.white), 
+    title: const Text(
+      'ticke.it',
         style: TextStyle(
           fontSize: 26, // Fonte maior para destaque
           fontWeight: FontWeight.bold,
@@ -38,7 +39,7 @@ class Header extends StatelessWidget implements PreferredSizeWidget {
       flexibleSpace: Container(
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.blue, Colors.lightBlueAccent],
+            colors: [Color.fromARGB(255, 0, 0, 0), Color.fromARGB(255, 100, 100, 100)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),

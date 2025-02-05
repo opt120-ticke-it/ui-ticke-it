@@ -11,7 +11,7 @@ class MenuDrawer extends StatelessWidget {
         children: <Widget>[
           const DrawerHeader(
             decoration: BoxDecoration(
-              color: Colors.blue, // Cor do cabeçalho
+              color: Color.fromARGB(255, 0, 0, 0), // Cor do cabeçalho
             ),
             child: Text(
               'ticke.it',

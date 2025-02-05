@@ -21,7 +21,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'ticke.it',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: ThemeData(
+  primaryColor: Colors.black, // Define preto como cor principal
+),
       debugShowCheckedModeBanner: false,
       home: const LoginScreen(),
     );
