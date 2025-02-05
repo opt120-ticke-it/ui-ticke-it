@@ -41,27 +41,46 @@ class _EventScreenState extends State<EventScreen> {
   }
 
   void showTicketModal() {
-    showModalBottomSheet(
+    showDialog(
       context: context,
       builder: (context) {
-        return Container(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
+        return AlertDialog(
+          title: Text('Selecione o tipo de ingresso'),
+          content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Selecione o tipo de ingresso', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               ...event['ticketTypes'].map<Widget>((ticketType) {
                 return ListTile(
                   title: Text(ticketType['name']),
                   subtitle: Text('Preço: ${ticketType['price']}'),
                   onTap: () {
-                    // Lógica para selecionar o ingresso
                     Navigator.pop(context);
+                    showConfirmationDialog(ticketType['name']);
                   },
                 );
               }).toList(),
             ],
           ),
+        );
+      },
+    );
+  }
+
+  void showConfirmationDialog(String ticketTypeName) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text('Ingresso Adquirido'),
+          content: Text('Você adquiriu o ingresso: $ticketTypeName'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('OK'),
+            ),
+          ],
         );
       },
     );
@@ -79,19 +98,26 @@ class _EventScreenState extends State<EventScreen> {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Image.network('http://localhost:3000/image16x9/${event['id']}'),
+                    Container(
+                      height: 200,
+                      width: double.infinity,
+                      color: Colors.grey.shade200,
+                      child: event['id'] != null
+                          ? Image.network('http://localhost:3000/image16x9/${event['id']}', fit: BoxFit.cover)
+                          : Container(), // Box em branco se não encontrar a imagem
+                    ),
                     SizedBox(height: 16.0),
                     Text(event['name'], style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                     SizedBox(height: 8.0),
-                    Text('Descrição: ${event['description']}'),
+                    Text('Descrição: ${event['description']}', textAlign: TextAlign.center),
                     SizedBox(height: 8.0),
-                    Text('Data de Início: ${formatDate(event['startDate'])}'),
+                    Text('Data de Início: ${formatDate(event['startDate'])}', textAlign: TextAlign.center),
                     SizedBox(height: 8.0),
-                    Text('Data de Término: ${formatDate(event['endDate'])}'),
+                    Text('Data de Término: ${formatDate(event['endDate'])}', textAlign: TextAlign.center),
                     SizedBox(height: 8.0),
-                    Text('Local: ${event['location']}'),
+                    Text('Local: ${event['location']}', textAlign: TextAlign.center),
                     SizedBox(height: 16.0),
                     ElevatedButton(
                       onPressed: showTicketModal,
