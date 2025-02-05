@@ -23,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> fetchCategories() async {
-    final response = await http.get(Uri.parse('http://localhost:3000/category/events/list'));
+    final response = await http.get(Uri.parse('http://localhost:3000/category/'));
     if (response.statusCode == 200) {
       setState(() {
         categories = json.decode(response.body);
