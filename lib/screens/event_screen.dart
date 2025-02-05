@@ -14,23 +14,38 @@ class EventScreen extends StatefulWidget {
 
 class _EventScreenState extends State<EventScreen> {
   Map event = {};
+  List ticketTypes = [];
   bool isLoading = true;
+  bool hasError = false;
 
   @override
   void initState() {
     super.initState();
-    fetchEvent();
+    fetchEventAndTickets();
   }
 
-  Future<void> fetchEvent() async {
-    final response = await http.get(Uri.parse('http://localhost:3000/event/${widget.eventId}'));
-    if (response.statusCode == 200) {
+  Future<void> fetchEventAndTickets() async {
+    try {
+      final eventResponse = await http.get(Uri.parse('http://localhost:3000/event/${widget.eventId}'));
+      final ticketResponse = await http.get(Uri.parse('http://localhost:3000/event/${widget.eventId}/ticketTypes'));
+
+      if (eventResponse.statusCode == 200 && ticketResponse.statusCode == 200) {
+        setState(() {
+          event = json.decode(eventResponse.body);
+          ticketTypes = json.decode(ticketResponse.body);
+          isLoading = false;
+        });
+      } else {
+        setState(() {
+          hasError = true;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
       setState(() {
-        event = json.decode(response.body);
+        hasError = true;
         isLoading = false;
       });
-    } else {
-      throw Exception('Failed to load event');
     }
   }
 
@@ -41,23 +56,44 @@ class _EventScreenState extends State<EventScreen> {
   }
 
   void showTicketModal() {
+    if (ticketTypes.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Nenhum ingresso disponível para este evento.')),
+      );
+      return;
+    }
+
     showModalBottomSheet(
       context: context,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
+      ),
+      backgroundColor: Colors.white,
       builder: (context) {
-        return Container(
+        return Padding(
           padding: EdgeInsets.all(16.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Selecione o tipo de ingresso', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-              ...event['ticketTypes'].map<Widget>((ticketType) {
-                return ListTile(
-                  title: Text(ticketType['name']),
-                  subtitle: Text('Preço: ${ticketType['price']}'),
-                  onTap: () {
-                    // Lógica para selecionar o ingresso
-                    Navigator.pop(context);
-                  },
+              Text(
+                'Selecione o tipo de ingresso',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 10),
+              ...ticketTypes.map<Widget>((ticketType) {
+                return Card(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  elevation: 3,
+                  margin: EdgeInsets.symmetric(vertical: 6),
+                  child: ListTile(
+                    title: Text(ticketType['name'], style: TextStyle(fontWeight: FontWeight.bold)),
+                    subtitle: Text('Preço: R\$ ${ticketType['price']}'),
+                    trailing: Icon(Icons.arrow_forward_ios, size: 16),
+                    onTap: () {
+                      Navigator.pop(context);
+                      showConfirmationDialog(ticketType);
+                    },
+                  ),
                 );
               }).toList(),
             ],
@@ -67,40 +103,131 @@ class _EventScreenState extends State<EventScreen> {
     );
   }
 
+  void showConfirmationDialog(Map ticketType) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Confirmação de Ingresso'),
+          content: Text('Você selecionou o ingresso "${ticketType['name']}" pelo valor de R\$ ${ticketType['price']}. Deseja continuar?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('Cancelar'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                // Lógica para finalizar a compra
+              },
+              child: Text('Confirmar'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Detalhes do Evento'),
+        title: Text('Detalhes do Evento', style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.black,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
-          : SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Image.network('http://localhost:3000/image16x9/${event['id']}'),
-                    SizedBox(height: 16.0),
-                    Text(event['name'], style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                    SizedBox(height: 8.0),
-                    Text('Descrição: ${event['description']}'),
-                    SizedBox(height: 8.0),
-                    Text('Data de Início: ${formatDate(event['startDate'])}'),
-                    SizedBox(height: 8.0),
-                    Text('Data de Término: ${formatDate(event['endDate'])}'),
-                    SizedBox(height: 8.0),
-                    Text('Local: ${event['location']}'),
-                    SizedBox(height: 16.0),
-                    ElevatedButton(
-                      onPressed: showTicketModal,
-                      child: Text('Escolher Ingresso'),
+          : hasError
+              ? Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.error, color: Colors.red, size: 48),
+                        SizedBox(height: 10),
+                        Text(
+                          'Erro ao carregar os detalhes do evento.',
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.center,
+                        ),
+                        SizedBox(height: 10),
+                        ElevatedButton(
+                          onPressed: fetchEventAndTickets,
+                          child: Text('Tentar Novamente'),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
+                )
+              : SingleChildScrollView(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(12),
+                        child: Image.network(
+                          'http://localhost:3000/image16x9/${event['id']}',
+                          height: 220,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                      SizedBox(height: 16.0),
+                      Text(
+                        event['name'],
+                        style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 8.0),
+                      Card(
+                        elevation: 4,
+                        margin: EdgeInsets.symmetric(vertical: 8),
+                        color: Colors.black,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        child: Padding(
+                          padding: const EdgeInsets.all(14.0),
+                          child: Text(
+                            event['description'],
+                            style: TextStyle(fontSize: 16, color: Colors.white),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16.0),
+                      Card(
+                        elevation: 3,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        child: Padding(
+                          padding: const EdgeInsets.all(14.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('📅 Data de Início: ${formatDate(event['startDate'])}', style: TextStyle(fontSize: 16)),
+                              SizedBox(height: 8),
+                              Text('🏁 Data de Término: ${formatDate(event['endDate'])}', style: TextStyle(fontSize: 16)),
+                              SizedBox(height: 8),
+                              Text('📍 Local: ${event['location']}', style: TextStyle(fontSize: 16)),
+                            ],
+                          ),
+                        ),
+                      ),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: showTicketModal,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.black,
+                            padding: EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            elevation: 5,
+                          ),
+                          child: Text('Escolher Ingresso', style: TextStyle(fontSize: 18, color: Colors.white)),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ),
     );
   }
 }
