@@ -7,8 +7,8 @@ import 'package:ticke_it/widgets/header.dart';
 
 class HomeScreen extends StatefulWidget {
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
-  HomeScreen({super.key});
-
+  HomeScreen({super.key,required this.user});
+  Map<String,dynamic> user;
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
@@ -45,7 +45,7 @@ class _HomeScreenState extends State<HomeScreen> {
           print('Carrinho pressionado');
         },
       ),
-      drawer: const MenuDrawer(),
+      drawer: MenuDrawer(responsedata: widget.user,),
       body: categories.isEmpty
           ? Center(child: CircularProgressIndicator())
           : ListView.builder(

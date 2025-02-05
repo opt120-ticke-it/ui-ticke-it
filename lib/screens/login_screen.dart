@@ -40,7 +40,7 @@ void _login(BuildContext context) async {
       );
 
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => HomeScreen()),
+        MaterialPageRoute(builder: (_) => HomeScreen(user: responseData,)),
       );
 
     } catch (e) {

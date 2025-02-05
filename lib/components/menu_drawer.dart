@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:ticke_it/screens/profile_screen.dart';
 
 class MenuDrawer extends StatelessWidget {
-  const MenuDrawer({super.key});
-
+  MenuDrawer({super.key,required this.responsedata});
+  Map<String,dynamic> responsedata;
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -31,9 +32,10 @@ class MenuDrawer extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.person),
-            title: const Text('Seus Dados'),
+            title: const Text('Meus Dados'),
             onTap: () {
               // Ação para "Seus Dados"
+              Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=>ProfileScreen(name: responsedata["token"]["user"]["name"],id:responsedata["token"]["user"]["id"],)));
             },
           ),
           ListTile(
