@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:ticke_it/screens/profile_screen.dart';
 import 'package:ticke_it/providers/user_provider.dart';
 import 'package:ticke_it/screens/login_screen.dart';
 
@@ -21,9 +22,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'ticke.it',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: ThemeData(
+        primaryColor: Colors.black, // Define preto como cor principal
+      ),
       debugShowCheckedModeBanner: false,
-      home: const LoginScreen(),
+      home: LoginScreen(),
     );
   }
 }

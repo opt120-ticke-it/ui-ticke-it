@@ -40,7 +40,7 @@ void _login(BuildContext context) async {
       );
 
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => HomeScreen()),
+        MaterialPageRoute(builder: (_) => HomeScreen(user: responseData,)),
       );
 
     } catch (e) {
@@ -174,7 +174,7 @@ void _login(BuildContext context) async {
                       ElevatedButton(
                         onPressed: _isLoading ? null : () => _login(context),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.blue[700],
+                          backgroundColor: const Color.fromARGB(255, 0, 0, 0),
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
