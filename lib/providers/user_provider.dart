@@ -3,10 +3,13 @@ import 'package:ticke_it/models/user.dart';
 
 class UserProvider extends ChangeNotifier {
   User _user = User(
-    name: '',
     id: '',
+    name: '',
     email: '',
     password: '',
+    cpf: '',
+    birthDate: DateTime.now(),
+    gender: '',
   );
 
   String? _token; // Token opcional, usado para autenticação.
@@ -31,10 +34,13 @@ class UserProvider extends ChangeNotifier {
   // Redefine o estado do usuário e limpa o token ao fazer logout.
   void logout() {
     _user = User(
-      name: '',
       id: '',
+      name: '',
       email: '',
       password: '',
+      cpf: '',
+      birthDate: DateTime.now(),
+      gender: '',
     );
     _token = null;
     notifyListeners();

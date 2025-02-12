@@ -1,17 +1,22 @@
-// ignore: constant_identifier_names
 import 'dart:convert';
 
 class User {
-  final String id;
+  final dynamic id;
   final String name;
   final String email;
-  final String password;
+  final String? password; // Tornado opcional
+  final String cpf;
+  final DateTime birthDate;
+  final String gender;
 
   User({
     required this.id,
     required this.name,
     required this.email,
-    required this.password,
+    this.password, // Tornado opcional
+    required this.cpf,
+    required this.birthDate,
+    required this.gender,
   });
 
   factory User.fromMap(Map<String, dynamic> map) {
@@ -19,7 +24,10 @@ class User {
       id: map['id'],
       name: map['name'],
       email: map['email'],
-      password: map['password'],
+      password: map['password'], // Tornado opcional
+      cpf: map['cpf'],
+      birthDate: DateTime.parse(map['birthDate']),
+      gender: map['gender'],
     );
   }
 
@@ -28,7 +36,10 @@ class User {
       'id': id,
       'name': name,
       'email': email,
-      'password': password,
+      'password': password, // Tornado opcional
+      'cpf': cpf,
+      'birthDate': birthDate.toIso8601String(),
+      'gender': gender,
     };
   }
 

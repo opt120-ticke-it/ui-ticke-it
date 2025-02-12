@@ -15,6 +15,9 @@ class AuthService {
     required String name,
     required String email,
     required String password,
+    required String cpf,
+    required String birthDate,
+    required String gender,
   }) async {
     final response = await http.post(
       Uri.parse('${_baseUrl}/user/registrar'),
@@ -25,6 +28,9 @@ class AuthService {
         'name': name,
         'email': email,
         'password': password,
+        'cpf': cpf,
+        'birthDate': DateTime.parse(birthDate).toIso8601String(),
+        'gender': gender,
       }),
     );
 
