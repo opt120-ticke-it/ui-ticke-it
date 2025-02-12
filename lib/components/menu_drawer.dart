@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:ticke_it/screens/my_events_screen.dart';
+import 'package:ticke_it/screens/profile_screen.dart';
+import 'package:ticke_it/screens/login_screen.dart';
+import 'package:ticke_it/providers/user_provider.dart';
 
 class MenuDrawer extends StatelessWidget {
   const MenuDrawer({super.key});
@@ -37,42 +41,29 @@ class MenuDrawer extends StatelessWidget {
             leading: const Icon(Icons.person),
             title: const Text('Seus Dados'),
             onTap: () {
-              // Ação para "Seus Dados"
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => ProfileScreen()),
+              );
             },
           ),
           ListTile(
-            leading: const Icon(Icons.support_agent),
-            title: const Text('Suporte'),
+            leading: const Icon(Icons.airplane_ticket),
+            title: const Text('Meus Ingressos'),
             onTap: () {
-              // Ação para "Suporte"
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.settings),
-            title: const Text('Configurações'),
-            onTap: () {
-              // Ação para "Configurações"
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.help_outline),
-            title: const Text('FAQ'),
-            onTap: () {
-              // Ação para "FAQ"
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.description),
-            title: const Text('Termos e Condições'),
-            onTap: () {
-              // Ação para "Termos e Condições"
+              // Ação para "Meus Ingressos"
             },
           ),
           ListTile(
             leading: const Icon(Icons.logout),
             title: const Text('Logout'),
             onTap: () {
-              // Ação para "Logout"
+              Provider.of<UserProvider>(context, listen: false).logout();
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => LoginScreen()),
+                (Route<dynamic> route) => false,
+              );
             },
           ),
         ],
