@@ -15,6 +15,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   List categories = [];
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -22,13 +23,26 @@ class _HomeScreenState extends State<HomeScreen> {
     fetchCategories();
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    fetchCategories();
+  }
+
   Future<void> fetchCategories() async {
-    final response = await http.get(Uri.parse('http://localhost:3000/category'));
+    setState(() {
+      isLoading = true;
+    });
+    final response = await http.get(Uri.parse('http://localhost:3000/category/events/list'));
     if (response.statusCode == 200) {
       setState(() {
         categories = json.decode(response.body);
+        isLoading = false;
       });
     } else {
+      setState(() {
+        isLoading = false;
+      });
       throw Exception('Failed to load categories');
     }
   }
@@ -44,16 +58,19 @@ class _HomeScreenState extends State<HomeScreen> {
         onCartPressed: () {
           print('Carrinho pressionado');
         },
+        onTitlePressed: fetchCategories, // Adicionado para recarregar a página inicial
       ),
       drawer: const MenuDrawer(),
-      body: categories.isEmpty
+      body: isLoading
           ? Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: categories.length,
-              itemBuilder: (context, index) {
-                return CategoryWidget(category: categories[index]);
-              },
-            ),
+          : categories.isEmpty
+              ? Center(child: Text('Não foi encontrado nenhum evento'))
+              : ListView.builder(
+                  itemCount: categories.length,
+                  itemBuilder: (context, index) {
+                    return CategoryWidget(category: categories[index]);
+                  },
+                ),
     );
   }
 }

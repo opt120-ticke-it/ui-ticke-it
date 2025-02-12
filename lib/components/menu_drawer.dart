@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:ticke_it/screens/my_events_screen.dart';
 
 class MenuDrawer extends StatelessWidget {
   const MenuDrawer({super.key});
@@ -26,7 +27,10 @@ class MenuDrawer extends StatelessWidget {
             leading: const Icon(Icons.event),
             title: const Text('Meus Eventos'),
             onTap: () {
-              // Ação para "Meus Eventos"
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MyEventsScreen()),
+              );
             },
           ),
           ListTile(

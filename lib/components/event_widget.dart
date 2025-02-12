@@ -1,21 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:ticke_it/screens/event_screen.dart';
+import 'dart:convert';
 
 class EventWidget extends StatelessWidget {
   final Map event;
 
   EventWidget({required this.event});
-
-  Future<String> fetchImage(int eventId) async {
-    final response = await http.get(Uri.parse('http://localhost:3000/image4x3/$eventId'));
-    if (response.statusCode == 200) {
-      return response.body;
-    } else {
-      return ''; // Retorna string vazia se não encontrar a imagem
-    }
-  }
 
   String formatDate(String date) {
     final DateTime parsedDate = DateTime.parse(date);
@@ -23,66 +14,80 @@ class EventWidget extends StatelessWidget {
     return formatter.format(parsedDate);
   }
 
+  bool isValidBase64(String base64String) {
+    try {
+      base64Decode(base64String);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: fetchImage(event['id']),
-      builder: (context, snapshot) {
-        return GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => EventScreen(eventId: event['id'])),
-            );
-          },
-          child: Container(
-            width: 150,
-            margin: EdgeInsets.all(8.0),
-            decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey.shade300),
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  height: 100,
-                  width: double.infinity,
-                  color: Colors.grey.shade200,
-                  child: snapshot.connectionState == ConnectionState.waiting
-                      ? Center(child: CircularProgressIndicator())
-                      : snapshot.hasError || snapshot.data == ''
-                          ? Container() // Box em branco se não encontrar a imagem
-                          : Image.network(snapshot.data as String, fit: BoxFit.cover),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Text(
-                        event['name'],
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(height: 4.0),
-                      Text(
-                        'Data: ${formatDate(event['startDate'])}',
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(height: 4.0),
-                      Text(
-                        'Local: ${event['location']}',
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
+    // Extrair a imagem 4x3 da lista de imagens
+    final image4x3 = event['images']?.firstWhere(
+      (image) => image['type'] == '4x3',
+      orElse: () => null,
+    );
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => EventScreen(eventId: event['id'])),
         );
       },
+      child: Container(
+        width: 150,
+        margin: EdgeInsets.all(8.0),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade300),
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 100,
+              width: double.infinity,
+              color: Colors.white,
+              child: image4x3 == null || !isValidBase64(image4x3['base64'])
+                  ? Center(child: Text('Sem imagem'))
+                  : Image.memory(
+                      base64Decode(image4x3['base64']),
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) {
+                        return Center(child: Text('Erro ao carregar imagem'));
+                      },
+                    ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    event['name'],
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 4.0),
+                  Text(
+                    'Data: ${formatDate(event['startDate'])}',
+                    textAlign: TextAlign.center,
+                  ),
+                  SizedBox(height: 4.0),
+                  Text(
+                    'Local: ${event['location']}',
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

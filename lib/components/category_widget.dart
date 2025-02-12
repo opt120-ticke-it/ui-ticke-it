@@ -8,6 +8,8 @@ class CategoryWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final events = category['events'] ?? [];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -18,7 +20,7 @@ class CategoryWidget extends StatelessWidget {
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
           ),
         ),
-        EventCarousel(events: category['events']),
+        EventCarousel(events: events),
       ],
     );
   }

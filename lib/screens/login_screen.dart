@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ticke_it/models/user.dart';
 import 'package:ticke_it/providers/user_provider.dart';
-import 'package:ticke_it/screens/signup_screen.dart';
-import 'dart:convert';
-import 'package:ticke_it/services/auth_services.dart';
 import 'package:ticke_it/screens/home_screen.dart';
+import 'package:ticke_it/services/auth_services.dart';
+import 'package:ticke_it/screens/signup_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -22,41 +21,41 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   bool _obscurePassword = true;
 
-void _login(BuildContext context) async {
-  if (_formKey.currentState?.validate() ?? false) {
-    setState(() {
-      _isLoading = true;
-    });
-
-    try {
-      final Map<String, dynamic> responseData = await AuthService.login(
-        email: _emailController.text,
-        password: _passwordController.text,
-      );
-      final token = responseData['token'];
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login realizado com sucesso!')),
-      );
-
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => HomeScreen()),
-      );
-
-    } catch (e) {
-      print('Erro no login: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
-      );
-    } finally {
+  void _login(BuildContext context) async {
+    if (_formKey.currentState?.validate() ?? false) {
       setState(() {
-        _isLoading = false;
+        _isLoading = true;
       });
+
+      try {
+        final Map<String, dynamic> responseData = await AuthService.login(
+          email: _emailController.text,
+          password: _passwordController.text,
+        );
+        final token = responseData['token'];
+        final user = User.fromMap(responseData['user']);
+
+        Provider.of<UserProvider>(context, listen: false).setUserFromModel(user, token: token);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Login realizado com sucesso!')),
+        );
+
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => HomeScreen()),
+        );
+      } catch (e) {
+        print('Erro no login: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString())),
+        );
+      } finally {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
-}
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -65,8 +64,7 @@ void _login(BuildContext context) async {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
+            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -76,11 +74,10 @@ void _login(BuildContext context) async {
                       const SizedBox(height: 16),
                       Text(
                         'Bem-vindo ao ticke.it!',
-                        style:
-                            Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black87,
-                                ),
+                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
                       ),
                       const SizedBox(height: 8),
                       Text(
@@ -120,7 +117,6 @@ void _login(BuildContext context) async {
                           return null;
                         },
                       ),
-
                       const SizedBox(height: 16),
                       TextFormField(
                         controller: _passwordController,
@@ -129,9 +125,7 @@ void _login(BuildContext context) async {
                           prefixIcon: const Icon(Icons.lock_outline),
                           suffixIcon: IconButton(
                             icon: Icon(
-                              _obscurePassword
-                                  ? Icons.visibility_off
-                                  : Icons.visibility,
+                              _obscurePassword ? Icons.visibility_off : Icons.visibility,
                               color: Colors.grey,
                             ),
                             onPressed: () {
@@ -169,7 +163,6 @@ void _login(BuildContext context) async {
                           ),
                         ),
                       ),
-
                       const SizedBox(height: 24),
                       ElevatedButton(
                         onPressed: _isLoading ? null : () => _login(context),
@@ -198,7 +191,6 @@ void _login(BuildContext context) async {
                                 ),
                               ),
                       ),
-
                       const SizedBox(height: 24),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,

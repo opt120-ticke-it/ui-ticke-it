@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class Header extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onMenuPressed;
   final VoidCallback onCartPressed;
+  final VoidCallback onTitlePressed;
 
   const Header({
     Key? key,
     required this.onMenuPressed,
     required this.onCartPressed,
+    required this.onTitlePressed,
   }) : super(key: key);
 
   @override
@@ -17,13 +19,16 @@ class Header extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return AppBar(
       iconTheme: const IconThemeData(color: Colors.white), 
-    title: const Text(
-      'ticke.it',
-        style: TextStyle(
-          fontSize: 26, // Fonte maior para destaque
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-          letterSpacing: 1.2, // Espaçamento entre letras
+      title: GestureDetector(
+        onTap: onTitlePressed,
+        child: const Text(
+          'ticke.it',
+          style: TextStyle(
+            fontSize: 26, // Fonte maior para destaque
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            letterSpacing: 1.2, // Espaçamento entre letras
+          ),
         ),
       ),
       centerTitle: true,

@@ -63,40 +63,29 @@ class _EventScreenState extends State<EventScreen> {
       return;
     }
 
-    showModalBottomSheet(
+    showDialog(
       context: context,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16.0)),
-      ),
-      backgroundColor: Colors.white,
-      builder: (context) {
-        return Padding(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Selecione o tipo de ingresso'),
+          content: Column(
             mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Selecione o tipo de ingresso',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 10),
-              ...ticketTypes.map<Widget>((ticketType) {
-                return Card(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  elevation: 3,
-                  margin: EdgeInsets.symmetric(vertical: 6),
-                  child: ListTile(
-                    title: Text(ticketType['name'], style: TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Text('Preço: R\$ ${ticketType['price']}'),
-                    trailing: Icon(Icons.arrow_forward_ios, size: 16),
-                    onTap: () {
-                      Navigator.pop(context);
-                      showConfirmationDialog(ticketType);
-                    },
-                  ),
-                );
-              }).toList(),
-            ],
+            children: ticketTypes.map<Widget>((ticketType) {
+              return Card(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                elevation: 3,
+                margin: EdgeInsets.symmetric(vertical: 6),
+                child: ListTile(
+                  title: Text(ticketType['name'], style: TextStyle(fontWeight: FontWeight.bold)),
+                  subtitle: Text('Preço: R\$ ${ticketType['price']}'),
+                  trailing: Icon(Icons.arrow_forward_ios, size: 16),
+                  onTap: () {
+                    Navigator.pop(context);
+                    showConfirmationDialog(ticketType);
+                  },
+                ),
+              );
+            }).toList(),
           ),
         );
       },
@@ -130,6 +119,12 @@ class _EventScreenState extends State<EventScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Extrair a imagem 16x9 da lista de imagens
+    final image16x9 = event['images']?.firstWhere(
+      (image) => image['type'] == '16x9',
+      orElse: () => null,
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Detalhes do Evento', style: TextStyle(color: Colors.white)),
@@ -168,12 +163,26 @@ class _EventScreenState extends State<EventScreen> {
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.circular(12),
-                        child: Image.network(
-                          'http://localhost:3000/image16x9/${event['id']}',
-                          height: 220,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
+                        child: image16x9 == null
+                            ? Container(
+                                height: 220,
+                                width: double.infinity,
+                                color: Colors.grey.shade200,
+                                child: Center(child: Text('Sem imagem')),
+                              )
+                            : Image.memory(
+                                base64Decode(image16x9['base64']),
+                                width: double.infinity,
+                                fit: BoxFit.contain,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    height: 220,
+                                    width: double.infinity,
+                                    color: Colors.grey.shade200,
+                                    child: Center(child: Text('Erro ao carregar imagem')),
+                                  );
+                                },
+                              ),
                       ),
                       SizedBox(height: 16.0),
                       Text(
