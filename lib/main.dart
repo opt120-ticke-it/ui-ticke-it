@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:ticke_it/providers/user_provider.dart';
 import 'package:ticke_it/screens/login_screen.dart';
+import 'package:ticke_it/screens/pagament_screen.dart';
 
 void main() {
   runApp(
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
   primaryColor: Colors.black, // Define preto como cor principal
 ),
       debugShowCheckedModeBanner: false,
-      home: const LoginScreen(),
+      home: const PagamentScreen(data: {},),
     );
   }
 }
