@@ -5,6 +5,9 @@ import 'package:ticke_it/providers/user_provider.dart';
 import 'package:ticke_it/screens/login_screen.dart';
 import 'package:ticke_it/services/auth_services.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_date_pickers/flutter_date_pickers.dart' as dp;
+import 'package:flutter_masked_text2/flutter_masked_text2.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -19,7 +22,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
-  final TextEditingController _cpfController = TextEditingController();
+  final TextEditingController _cpfController = MaskedTextController(mask: '000.000.000-00');
   final TextEditingController _birthDateController = TextEditingController();
   String _gender = 'Masculino';
 
@@ -73,18 +76,33 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
+    DateTime? picked = await showDatePicker(
       context: context,
+      locale: const Locale("pt", "BR"), // Define o idioma para português
       initialDate: DateTime.now(),
       firstDate: DateTime(1900),
       lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: Colors.blue, // Cor do cabeçalho
+              onPrimary: Colors.white, // Texto do cabeçalho
+              onSurface: Colors.black, // Cor dos números do calendário
+            ),
+            dialogBackgroundColor: Colors.white, // Cor de fundo do calendário
+          ),
+          child: child!,
+        );
+      },
     );
-    if (picked != null && picked != DateTime.now()) {
-      setState(() {
-        _birthDateController.text = DateFormat('yyyy-MM-dd').format(picked);
-      });
-    }
+
+  if (picked != null) {
+    setState(() {
+      _birthDateController.text = DateFormat('dd/MM/yyyy', 'pt_BR').format(picked);
+    });
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -204,7 +222,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           fillColor: Colors.grey[100],
                         ),
                         readOnly: true,
-                        onTap: () => _selectDate(context),
+                        onTap: () => _selectDate(context), 
                         validator: (value) {
                           if (value == null || value.isEmpty) {
                             return 'Por favor, insira sua data de nascimento.';
