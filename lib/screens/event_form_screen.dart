@@ -3,9 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:html' as html;
 import 'package:ticke_it/providers/user_provider.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:intl/intl.dart';
 
 class EventFormScreen extends StatefulWidget {
@@ -41,14 +39,16 @@ class _EventFormScreenState extends State<EventFormScreen> {
       _endDateController.text = _formatDateTime(widget.event!['endDate']);
       _locationController.text = widget.event!['location'];
       _selectedCategory = widget.event!['categoryId'].toString();
-      ticketTypes = List<Map<String, dynamic>>.from(widget.event!['ticketTypes'] ?? []);
+      ticketTypes =
+          List<Map<String, dynamic>>.from(widget.event!['ticketTypes'] ?? []);
       _image4x3Base64 = widget.event!['image4x3'];
       _image16x9Base64 = widget.event!['image16x9'];
     }
   }
 
   Future<void> fetchCategories() async {
-    final response = await http.get(Uri.parse('http://localhost:3000/category'));
+    final response =
+        await http.get(Uri.parse('http://localhost:3000/category'));
     if (response.statusCode == 200) {
       setState(() {
         categories = json.decode(response.body);
@@ -58,7 +58,8 @@ class _EventFormScreenState extends State<EventFormScreen> {
     }
   }
 
-  Future<void> _selectDateTime(BuildContext context, TextEditingController controller) async {
+  Future<void> _selectDateTime(
+      BuildContext context, TextEditingController controller) async {
     final DateTime? pickedDate = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -134,7 +135,8 @@ class _EventFormScreenState extends State<EventFormScreen> {
       final event = {
         'name': _nameController.text,
         'description': _descriptionController.text,
-        'startDate': _parseDateTime(_startDateController.text).toIso8601String(),
+        'startDate':
+            _parseDateTime(_startDateController.text).toIso8601String(),
         'endDate': _parseDateTime(_endDateController.text).toIso8601String(),
         'location': _locationController.text,
         'categoryId': int.parse(_selectedCategory!),
@@ -293,7 +295,8 @@ class _EventFormScreenState extends State<EventFormScreen> {
                   children: [
                     TextFormField(
                       initialValue: ticketType['name'],
-                      decoration: InputDecoration(labelText: 'Nome do Ingresso'),
+                      decoration:
+                          InputDecoration(labelText: 'Nome do Ingresso'),
                       onChanged: (value) {
                         ticketType['name'] = value;
                       },
@@ -322,7 +325,8 @@ class _EventFormScreenState extends State<EventFormScreen> {
                     const SizedBox(height: 8),
                     TextFormField(
                       initialValue: ticketType['totalQuantity'].toString(),
-                      decoration: InputDecoration(labelText: 'Quantidade Total'),
+                      decoration:
+                          InputDecoration(labelText: 'Quantidade Total'),
                       keyboardType: TextInputType.number,
                       onChanged: (value) {
                         ticketType['totalQuantity'] = int.parse(value);
