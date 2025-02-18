@@ -3,9 +3,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:html' as html;
 import 'package:ticke_it/providers/user_provider.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:intl/intl.dart';
 
 class EventFormScreen extends StatefulWidget {
@@ -27,6 +25,7 @@ class _EventFormScreenState extends State<EventFormScreen> {
   String? _selectedCategory;
   List categories = [];
   List<Map<String, dynamic>> ticketTypes = [];
+  List<Map<String, dynamic>> newTicketTypes = [];
   String? _image4x3Base64;
   String? _image16x9Base64;
 
@@ -114,24 +113,29 @@ class _EventFormScreenState extends State<EventFormScreen> {
 
   void _addTicketType() {
     setState(() {
-      ticketTypes.add({
+      final newTicketType = {
         'name': '',
         'price': 0.0,
         'totalQuantity': 0,
-      });
+      };
+      newTicketTypes.add(newTicketType);
+      ticketTypes.add(newTicketType);
     });
   }
 
-  void _removeTicketType(int index) {
+  void _removeNewTicketType(Map<String, dynamic> ticketType) {
     setState(() {
-      ticketTypes.removeAt(index);
+      newTicketTypes.remove(ticketType);
+      ticketTypes.remove(ticketType);
     });
   }
 
   Future<void> _submitForm() async {
     if (_formKey.currentState?.validate() ?? false) {
       final userId = Provider.of<UserProvider>(context, listen: false).user.id;
+      print(widget.event!['id']);
       final event = {
+        'id': widget.event != null ? widget.event!['id'] : null,
         'name': _nameController.text,
         'description': _descriptionController.text,
         'startDate': _parseDateTime(_startDateController.text).toIso8601String(),
@@ -152,7 +156,7 @@ class _EventFormScreenState extends State<EventFormScreen> {
           : await http.patch(
               Uri.parse('http://localhost:3000/event/${widget.event!['id']}'),
               headers: {'Content-Type': 'application/json'},
-              body: jsonEncode(event),
+              body: jsonEncode(event..removeWhere((key, value) => value == null)),
             );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -335,10 +339,11 @@ class _EventFormScreenState extends State<EventFormScreen> {
                       },
                     ),
                     const SizedBox(height: 8),
-                    ElevatedButton(
-                      onPressed: () => _removeTicketType(index),
-                      child: Text('Remover Ingresso'),
-                    ),
+                    if (newTicketTypes.contains(ticketType))
+                      ElevatedButton(
+                        onPressed: () => _removeNewTicketType(ticketType),
+                        child: Text('Remover Ingresso'),
+                      ),
                     const SizedBox(height: 16),
                   ],
                 );
@@ -362,7 +367,11 @@ class _EventFormScreenState extends State<EventFormScreen> {
                         const SizedBox(height: 8),
                         _image4x3Base64 == null
                             ? Text('Nenhuma imagem selecionada')
-                            : Image.memory(base64Decode(_image4x3Base64!)),
+                            : Image.memory(
+                                base64Decode(_image4x3Base64!),
+                                height: 100,
+                                fit: BoxFit.contain,
+                              ),
                         const SizedBox(height: 8),
                         ElevatedButton(
                           onPressed: () => _pickImage(true),
@@ -379,7 +388,11 @@ class _EventFormScreenState extends State<EventFormScreen> {
                         const SizedBox(height: 8),
                         _image16x9Base64 == null
                             ? Text('Nenhuma imagem selecionada')
-                            : Image.memory(base64Decode(_image16x9Base64!)),
+                            : Image.memory(
+                                base64Decode(_image16x9Base64!),
+                                height: 100,
+                                fit: BoxFit.contain,
+                              ),
                         const SizedBox(height: 8),
                         ElevatedButton(
                           onPressed: () => _pickImage(false),
