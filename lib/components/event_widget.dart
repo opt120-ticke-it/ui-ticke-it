@@ -6,7 +6,10 @@ import 'dart:convert';
 class EventWidget extends StatelessWidget {
   final Map event;
 
-  EventWidget({required this.event});
+  const EventWidget({
+    Key? key,
+    required this.event,
+  }) : super(key: key);
 
   String formatDate(String date) {
     final DateTime parsedDate = DateTime.parse(date);
@@ -25,7 +28,6 @@ class EventWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Extrair a imagem 4x3 da lista de imagens
     final image4x3 = event['images']?.firstWhere(
       (image) => image['type'] == '4x3',
       orElse: () => null,
@@ -35,52 +37,138 @@ class EventWidget extends StatelessWidget {
       onTap: () {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => EventScreen(eventId: event['id'])),
+          MaterialPageRoute(
+              builder: (context) => EventScreen(eventId: event['id'])),
         );
       },
       child: Container(
-        width: 150,
-        margin: EdgeInsets.all(8.0),
+        clipBehavior: Clip.hardEdge,
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade300),
-          borderRadius: BorderRadius.circular(8.0),
+          borderRadius: BorderRadius.circular(16),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 8,
+              offset: Offset(0, 4),
+            ),
+          ],
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Container(
-              height: 100,
-              width: double.infinity,
-              color: Colors.white,
-              child: image4x3 == null || !isValidBase64(image4x3['base64'])
-                  ? Center(child: Text('Sem imagem'))
-                  : Image.memory(
-                      base64Decode(image4x3['base64']),
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return Center(child: Text('Erro ao carregar imagem'));
-                      },
-                    ),
+            // Container da imagem com proporção fixa 4:3
+            Expanded(
+              child: AspectRatio(
+                aspectRatio: 4 / 3,
+                child: Container(
+                  color: Colors.grey[100],
+                  child: image4x3 == null || !isValidBase64(image4x3['base64'])
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.image_not_supported,
+                                size: 32,
+                                color: Colors.grey[400],
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                'Sem imagem',
+                                style: TextStyle(
+                                  color: Colors.grey[600],
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : Image.memory(
+                          base64Decode(image4x3['base64']),
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.error_outline,
+                                    size: 32,
+                                    color: Colors.grey[400],
+                                  ),
+                                  SizedBox(height: 8),
+                                  Text(
+                                    'Erro ao carregar imagem',
+                                    style: TextStyle(
+                                      color: Colors.grey[600],
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                ),
+              ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(8.0),
+
+            // Informações do evento
+            Container(
+              padding: const EdgeInsets.all(16),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    event['name'],
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
+                    event['name'] ?? '',
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      height: 1.2,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                   ),
-                  SizedBox(height: 4.0),
-                  Text(
-                    'Data: ${formatDate(event['startDate'])}',
-                    textAlign: TextAlign.center,
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.calendar_today,
+                        size: 16,
+                        color: Colors.grey[600],
+                      ),
+                      const SizedBox(width: 4),
+                      Text(
+                        formatDate(event['startDate']),
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 4.0),
-                  Text(
-                    'Local: ${event['location']}',
-                    textAlign: TextAlign.center,
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.location_on,
+                        size: 16,
+                        color: Colors.grey[600],
+                      ),
+                      const SizedBox(width: 4),
+                      Expanded(
+                        child: Text(
+                          event['location'] ?? '',
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
