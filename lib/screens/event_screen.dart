@@ -234,7 +234,7 @@ class _EventScreenState extends State<EventScreen> {
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
-                // Lógica para finalizar a compra
+                // Lógica para finalizar a compra aqui
               },
               child: Text('Confirmar Compra'),
               style: ElevatedButton.styleFrom(
