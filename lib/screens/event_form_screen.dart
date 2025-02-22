@@ -134,15 +134,17 @@ class _EventFormScreenState extends State<EventFormScreen> {
   }
 
   Future<void> _submitForm() async {
-    if (_formKey.currentState?.validate() ?? false) {
+  if (_formKey.currentState?.validate() ?? false) {
+    try {
       final userId = Provider.of<UserProvider>(context, listen: false).user.id;
-      print(widget.event!['id']);
+      if (_selectedCategory == null) {
+        throw Exception('Categoria não selecionada');
+      }
       final event = {
         'id': widget.event != null ? widget.event!['id'] : null,
         'name': _nameController.text,
         'description': _descriptionController.text,
-        'startDate':
-            _parseDateTime(_startDateController.text).toIso8601String(),
+        'startDate': _parseDateTime(_startDateController.text).toIso8601String(),
         'endDate': _parseDateTime(_endDateController.text).toIso8601String(),
         'location': _locationController.text,
         'categoryId': int.parse(_selectedCategory!),
@@ -164,14 +166,19 @@ class _EventFormScreenState extends State<EventFormScreen> {
             );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        Navigator.pop(context);
+        Navigator.pop(context, true);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Erro ao salvar o evento')),
         );
       }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro: ${e.toString()}')),
+      );
     }
   }
+}
 
   @override
   Widget build(BuildContext context) {

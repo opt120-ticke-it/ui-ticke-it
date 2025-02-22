@@ -54,6 +54,10 @@ class _MyEventsScreenState extends State<MyEventsScreen> {
               ).then((_) => fetchEvents());
             },
           ),
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: fetchEvents,
+          ),
         ],
       ),
       body: isLoading
@@ -88,7 +92,7 @@ class EventItem extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => EventDetailsScreen(event: event),
+            builder: (context) => EventDetailsScreen(eventId: event['id']),
           ),
         );
       },
