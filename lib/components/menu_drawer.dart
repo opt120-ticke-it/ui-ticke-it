@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:ticke_it/screens/my_events_screen.dart';
 import 'package:ticke_it/screens/profile_screen.dart';
 import 'package:ticke_it/screens/login_screen.dart';
+import 'package:ticke_it/screens/my_tickets_screen.dart'; // Importar a nova tela
 import 'package:ticke_it/providers/user_provider.dart';
 
 class MenuDrawer extends StatelessWidget {
@@ -51,7 +52,10 @@ class MenuDrawer extends StatelessWidget {
             leading: const Icon(Icons.airplane_ticket),
             title: const Text('Meus Ingressos'),
             onTap: () {
-              // Ação para "Meus Ingressos"
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => MyTicketsScreen()), // Navegar para a nova tela
+              );
             },
           ),
           ListTile(
