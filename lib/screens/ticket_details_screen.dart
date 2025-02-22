@@ -62,6 +62,38 @@ class TicketDetailsScreen extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: Center(child: Text('QR Code')),
+                          content: Container(
+                            height: 300,
+                            width: 300,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                QrImageView(
+                                  data: ticket['qrCode'],
+                                  version: QrVersions.auto,
+                                  size: 250.0,
+                                ),
+                              ],
+                            ),
+                          ),
+                          actions: [
+                            Center(
+                              child: TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text('Fechar'),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    );
                   },
                   child: Text('Abrir QR Code'),
                 ),
