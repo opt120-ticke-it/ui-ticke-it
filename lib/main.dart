@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
   primaryColor: Colors.black, // Define preto como cor principal
 ),
       debugShowCheckedModeBanner: false,
-      home: const PagamentScreen(data: {},),
+      home: const LoginScreen(),
     );
   }
 }
