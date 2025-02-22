@@ -25,6 +25,7 @@ class _EventFormScreenState extends State<EventFormScreen> {
   String? _selectedCategory;
   List categories = [];
   List<Map<String, dynamic>> ticketTypes = [];
+  List<Map<String, dynamic>> newTicketTypes = [];
   String? _image4x3Base64;
   String? _image16x9Base64;
 
@@ -115,24 +116,29 @@ class _EventFormScreenState extends State<EventFormScreen> {
 
   void _addTicketType() {
     setState(() {
-      ticketTypes.add({
+      final newTicketType = {
         'name': '',
         'price': 0.0,
         'totalQuantity': 0,
-      });
+      };
+      newTicketTypes.add(newTicketType);
+      ticketTypes.add(newTicketType);
     });
   }
 
-  void _removeTicketType(int index) {
+  void _removeNewTicketType(Map<String, dynamic> ticketType) {
     setState(() {
-      ticketTypes.removeAt(index);
+      newTicketTypes.remove(ticketType);
+      ticketTypes.remove(ticketType);
     });
   }
 
   Future<void> _submitForm() async {
     if (_formKey.currentState?.validate() ?? false) {
       final userId = Provider.of<UserProvider>(context, listen: false).user.id;
+      print(widget.event!['id']);
       final event = {
+        'id': widget.event != null ? widget.event!['id'] : null,
         'name': _nameController.text,
         'description': _descriptionController.text,
         'startDate':
@@ -154,7 +160,7 @@ class _EventFormScreenState extends State<EventFormScreen> {
           : await http.patch(
               Uri.parse('http://localhost:3000/event/${widget.event!['id']}'),
               headers: {'Content-Type': 'application/json'},
-              body: jsonEncode(event),
+              body: jsonEncode(event..removeWhere((key, value) => value == null)),
             );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -339,10 +345,11 @@ class _EventFormScreenState extends State<EventFormScreen> {
                       },
                     ),
                     const SizedBox(height: 8),
-                    ElevatedButton(
-                      onPressed: () => _removeTicketType(index),
-                      child: Text('Remover Ingresso'),
-                    ),
+                    if (newTicketTypes.contains(ticketType))
+                      ElevatedButton(
+                        onPressed: () => _removeNewTicketType(ticketType),
+                        child: Text('Remover Ingresso'),
+                      ),
                     const SizedBox(height: 16),
                   ],
                 );
@@ -366,7 +373,11 @@ class _EventFormScreenState extends State<EventFormScreen> {
                         const SizedBox(height: 8),
                         _image4x3Base64 == null
                             ? Text('Nenhuma imagem selecionada')
-                            : Image.memory(base64Decode(_image4x3Base64!)),
+                            : Image.memory(
+                                base64Decode(_image4x3Base64!),
+                                height: 100,
+                                fit: BoxFit.contain,
+                              ),
                         const SizedBox(height: 8),
                         ElevatedButton(
                           onPressed: () => _pickImage(true),
@@ -383,7 +394,11 @@ class _EventFormScreenState extends State<EventFormScreen> {
                         const SizedBox(height: 8),
                         _image16x9Base64 == null
                             ? Text('Nenhuma imagem selecionada')
-                            : Image.memory(base64Decode(_image16x9Base64!)),
+                            : Image.memory(
+                                base64Decode(_image16x9Base64!),
+                                height: 100,
+                                fit: BoxFit.contain,
+                              ),
                         const SizedBox(height: 8),
                         ElevatedButton(
                           onPressed: () => _pickImage(false),

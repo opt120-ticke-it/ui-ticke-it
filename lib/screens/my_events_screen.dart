@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:provider/provider.dart';
 import 'package:ticke_it/providers/user_provider.dart';
 import 'package:ticke_it/screens/event_form_screen.dart';
+import 'package:ticke_it/screens/event_details_screen.dart';
 
 class MyEventsScreen extends StatefulWidget {
   const MyEventsScreen({super.key});
@@ -87,7 +88,7 @@ class EventItem extends StatelessWidget {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => EventFormScreen(event: event),
+            builder: (context) => EventDetailsScreen(event: event),
           ),
         );
       },
