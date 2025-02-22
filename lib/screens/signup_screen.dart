@@ -5,6 +5,7 @@ import 'package:ticke_it/providers/user_provider.dart';
 import 'package:ticke_it/screens/login_screen.dart';
 import 'package:ticke_it/services/auth_services.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_masked_text2/flutter_masked_text2.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -19,7 +20,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
-  final TextEditingController _cpfController = TextEditingController();
+  final TextEditingController _cpfController = MaskedTextController(mask: '000.000.000-00');
   final TextEditingController _birthDateController = TextEditingController();
   String _gender = 'Masculino';
 

@@ -33,7 +33,8 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       isLoading = true;
     });
-    final response = await http.get(Uri.parse('http://localhost:3000/category/events/list'));
+    final response =
+        await http.get(Uri.parse('http://localhost:3000/category/events/list'));
     if (response.statusCode == 200) {
       setState(() {
         categories = json.decode(response.body);
@@ -58,7 +59,8 @@ class _HomeScreenState extends State<HomeScreen> {
         onCartPressed: () {
           print('Carrinho pressionado');
         },
-        onTitlePressed: fetchCategories, // Adicionado para recarregar a página inicial
+        onTitlePressed:
+            fetchCategories, // Adicionado para recarregar a página inicial
       ),
       drawer: const MenuDrawer(),
       body: isLoading
