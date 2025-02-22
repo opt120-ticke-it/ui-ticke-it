@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:ticke_it/providers/user_provider.dart';
 import 'package:ticke_it/screens/login_screen.dart';
+import 'package:ticke_it/screens/pagament_screen.dart';
 
 void main() {
   runApp(

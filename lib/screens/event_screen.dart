@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:ticke_it/providers/user_provider.dart';
+import 'package:ticke_it/screens/pagament_screen.dart';
 
 class EventScreen extends StatefulWidget {
   final int eventId;
@@ -234,7 +237,7 @@ class _EventScreenState extends State<EventScreen> {
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
-                // Lógica para finalizar a compra aqui
+                _navigateToPaymentScreen(ticketType);
               },
               child: Text('Confirmar Compra'),
               style: ElevatedButton.styleFrom(
@@ -249,6 +252,22 @@ class _EventScreenState extends State<EventScreen> {
           ],
         );
       },
+    );
+  }
+
+  void _navigateToPaymentScreen(Map ticketType) {
+    final userId = Provider.of<UserProvider>(context, listen: false).user.id; // Obter o ID do usuário real
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => PagamentScreen(
+          data: {
+            'userId': userId,
+            'event': event,
+            'ticketType': ticketType,
+          },
+        ),
+      ),
     );
   }
 
