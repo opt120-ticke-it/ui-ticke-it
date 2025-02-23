@@ -129,29 +129,6 @@ class _PagamentScreenState extends State<PagamentScreen> {
       'ticketTypeId': ticketTypeId,
     }),
   );
-
-  if (response.statusCode == 200 || response.statusCode == 201) {
-    // Supondo que a resposta retorna o ID do ticket criado
-    final responseData = jsonDecode(response.body);
-    final ticketId = responseData['id'];
-
-    // Agora, atualizar o status do ticket para "VENDIDO"
-    final updateResponse = await http.put(
-      Uri.parse('http://localhost:3000/ticket/$ticketId'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'status': 'VENDIDO'}),
-    );
-
-    if (updateResponse.statusCode == 200) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Pagamento realizado com sucesso!.')),
-      );
-    }
-  } else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Erro ao realizar o pagamento.')),
-    );
-  }
 }
 
 
