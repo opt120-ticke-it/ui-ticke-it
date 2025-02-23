@@ -24,12 +24,35 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'ticke.it',
       theme: ThemeData(
-        primaryColor: Colors.black, // Define preto como cor principal
+        useMaterial3: false,
+        primaryColor: Colors.black,
+        scaffoldBackgroundColor: Colors.white,
+        colorScheme: ColorScheme.light(
+          primary: Colors.black,
+          secondary: Colors.black,
+          background: Colors.white,
+          surface: Colors.white,
+          onPrimary: Colors.white,
+          onSecondary: Colors.white,
+          onSurface: Colors.black,
+          onBackground: Colors.black,
+        ),
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.black,
+          iconTheme: IconThemeData(color: Colors.white),
+          titleTextStyle: TextStyle(
+              color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.black,
+            foregroundColor: Colors.white,
+            textStyle: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          ),
+        ),
       ),
       debugShowCheckedModeBanner: false,
       home: const LoginScreen(),
-      
-      // 🌍 Adicionando suporte a Português-BR
       supportedLocales: const [
         Locale('pt', 'BR'),
       ],

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:ticke_it/screens/transfer_ticket_screen.dart';
 
-class TicketDetailsScreen extends StatelessWidget {
+class TicketDetailsScreen extends StatefulWidget {
   final Map ticket;
 
   TicketDetailsScreen({required this.ticket});
@@ -108,6 +109,20 @@ class TicketDetailsScreen extends StatelessWidget {
   }
 
   @override
+  _TicketDetailsScreenState createState() => _TicketDetailsScreenState();
+}
+
+class _TicketDetailsScreenState extends State<TicketDetailsScreen> {
+  late Map ticket;
+
+  @override
+  void initState() {
+    super.initState();
+    // Clona o ticket para evitar mutação direta
+    ticket = {...widget.ticket};
+  }
+
+  @override
   Widget build(BuildContext context) {
     final event = ticket['event'];
     final ticketType = ticket['ticketType'];
@@ -120,161 +135,239 @@ class TicketDetailsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
         title: Text(
           'Detalhes do Ingresso',
-          style: TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.bold,
-          ),
+          style: TextStyle(color: Colors.white),
         ),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black87),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
+        centerTitle: true,
+        backgroundColor: Colors.black,
+        iconTheme: IconThemeData(color: Colors.white),
       ),
-      body: SingleChildScrollView(
+      body: Container(
+        color: Color.fromARGB(
+            255, 255, 255, 255), // Fundo geral um pouco mais escuro
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  bottomLeft: Radius.circular(24),
-                  bottomRight: Radius.circular(24),
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).primaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Text(
-                      ticketType['name'],
-                      style: TextStyle(
-                        color: Theme.of(context).primaryColor,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  Text(
-                    event['name'],
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ],
+            _buildEventDetails(
+              event,
+              ticketType,
+              formattedStartDate,
+              formattedEndDate,
+            ),
+            const SizedBox(height: 16.0),
+            _buildTicketStatus(),
+            const Spacer(),
+            _buildActionButtons(context),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEventDetails(
+    Map event,
+    Map ticketType,
+    String startDate,
+    String endDate,
+  ) {
+    return Card(
+      color: Colors.white, // Card claro para o texto preto ficar visível
+      elevation: 5,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        // Aqui estão os "detalhes", então texto em preto
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              event['name'] ?? '',
+              style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors
+                    .black, // Nome do evento em preto (faz parte dos detalhes)
               ),
             ),
-            Padding(
-              padding: EdgeInsets.all(24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Informações do Evento',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  Card(
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      side: BorderSide(color: Colors.grey.shade200),
-                    ),
-                    child: Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          _buildInfoItem(
-                            Icons.description_outlined,
-                            'Descrição',
-                            event['description'],
-                          ),
-                          Divider(),
-                          _buildInfoItem(
-                            Icons.calendar_today_outlined,
-                            'Data de Início',
-                            formattedStartDate,
-                          ),
-                          Divider(),
-                          _buildInfoItem(
-                            Icons.calendar_today_outlined,
-                            'Data de Término',
-                            formattedEndDate,
-                          ),
-                          Divider(),
-                          _buildInfoItem(
-                            Icons.location_on_outlined,
-                            'Local',
-                            event['location'],
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 32),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: ElevatedButton.icon(
-                          onPressed: () =>
-                              _showQRCode(context, ticket['qrCode']),
-                          icon: Icon(Icons.qr_code),
-                          label: Text('Ver QR Code'),
-                          style: ElevatedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: OutlinedButton.icon(
-                          onPressed: () {
-                            // Ação para transferir o ingresso
-                          },
-                          icon: Icon(Icons.swap_horiz),
-                          label: Text('Transferir'),
-                          style: OutlinedButton.styleFrom(
-                            padding: EdgeInsets.symmetric(vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+            SizedBox(height: 10),
+            _buildDetailRow(
+              Icons.description,
+              'Descrição:',
+              event['description'] ?? '',
+            ),
+            _buildDetailRow(
+              Icons.confirmation_number,
+              'Tipo de Ingresso:',
+              ticketType['name'] ?? '',
+            ),
+            _buildDetailRow(Icons.date_range, 'Início:', startDate),
+            _buildDetailRow(Icons.event, 'Término:', endDate),
+            _buildDetailRow(
+              Icons.location_on,
+              'Local:',
+              event['location'] ?? '',
             ),
           ],
         ),
       ),
+    );
+  }
+
+  /// Cada linha de detalhe fica em preto
+  Widget _buildDetailRow(IconData icon, String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: Colors.black),
+          SizedBox(width: 8),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+          SizedBox(width: 4),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black,
+              ),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Se o ingresso já foi transferido, exibe essa mensagem
+  Widget _buildTicketStatus() {
+    if (ticket['transferred'] == true) {
+      return Card(
+        color: Colors.red[400],
+        elevation: 5,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error, color: Colors.white),
+              SizedBox(width: 8),
+              Text(
+                'Ingresso Transferido!',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white, // texto branco aqui
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+    return SizedBox.shrink();
+  }
+
+  /// Botões pretos com texto branco
+  Widget _buildActionButtons(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        ElevatedButton.icon(
+          icon: Icon(Icons.qr_code, color: Colors.white),
+          label: Text('Ver QR Code', style: TextStyle(color: Colors.white)),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.black,
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+          onPressed: () => _showQRCodeDialog(context),
+        ),
+        ElevatedButton.icon(
+          icon: Icon(Icons.send, color: Colors.white),
+          label: Text('Transferir', style: TextStyle(color: Colors.white)),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.black,
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
+          onPressed: () async {
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => TransferTicketScreen(ticket: ticket),
+              ),
+            );
+
+            if (result == true) {
+              setState(() {
+                ticket = {...ticket, 'transferred': true}; // Atualiza o estado
+              });
+            }
+          },
+        ),
+      ],
+    );
+  }
+
+  void _showQRCodeDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return Dialog(
+          backgroundColor: Colors.black, // Fundo preto
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'QR Code',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white, // Texto branco
+                  ),
+                ),
+                SizedBox(height: 16),
+                // Mantemos o QR code normal
+                QrImageView(
+                  data: ticket['qrCode'],
+                  version: QrVersions.auto,
+                  size: 200.0,
+                  backgroundColor:
+                      Colors.white, // Para destacar o QR do fundo preto
+                ),
+                SizedBox(height: 16),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text(
+                    'Fechar',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
