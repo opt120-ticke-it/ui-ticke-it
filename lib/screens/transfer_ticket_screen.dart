@@ -5,7 +5,6 @@ import 'dart:convert';
 import 'package:provider/provider.dart';
 import 'package:ticke_it/providers/user_provider.dart';
 
-// ✅ Criar um formatter para CPF
 class CPFInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
