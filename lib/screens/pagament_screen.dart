@@ -116,30 +116,21 @@ class _PagamentScreenState extends State<PagamentScreen> {
   }
 
   Future<void> _submitPayment() async {
-    final userId = widget.data['userId'];
-    final eventId = widget.data['event']['id'];
-    final ticketTypeId = widget.data['ticketType']['id'];
+  final userId = widget.data['userId'];
+  final eventId = widget.data['event']['id'];
+  final ticketTypeId = widget.data['ticketType']['id'];
 
-    final response = await http.post(
-      Uri.parse('http://localhost:3000/ticket'),
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'userId': userId,
-        'eventId': eventId,
-        'ticketTypeId': ticketTypeId,
-      }),
-    );
+  final response = await http.post(
+    Uri.parse('http://localhost:3000/ticket'),
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      'userId': userId,
+      'eventId': eventId,
+      'ticketTypeId': ticketTypeId,
+    }),
+  );
+}
 
-    if (response.statusCode == 200 || response.statusCode == 201) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Pagamento realizado com sucesso!')),
-      );
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao realizar o pagamento.')),
-      );
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
