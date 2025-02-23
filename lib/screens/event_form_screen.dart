@@ -134,294 +134,448 @@ class _EventFormScreenState extends State<EventFormScreen> {
   }
 
   Future<void> _submitForm() async {
-  if (_formKey.currentState?.validate() ?? false) {
-    try {
-      final userId = Provider.of<UserProvider>(context, listen: false).user.id;
-      if (_selectedCategory == null) {
-        throw Exception('Categoria não selecionada');
-      }
-      final event = {
-        'id': widget.event != null ? widget.event!['id'] : null,
-        'name': _nameController.text,
-        'description': _descriptionController.text,
-        'startDate': _parseDateTime(_startDateController.text).toIso8601String(),
-        'endDate': _parseDateTime(_endDateController.text).toIso8601String(),
-        'location': _locationController.text,
-        'categoryId': int.parse(_selectedCategory!),
-        'organizerId': userId,
-        'ticketTypes': ticketTypes,
-        'image4x3': _image4x3Base64,
-        'image16x9': _image16x9Base64,
-      };
-      final response = widget.event == null
-          ? await http.post(
-              Uri.parse('http://localhost:3000/event'),
-              headers: {'Content-Type': 'application/json'},
-              body: jsonEncode(event),
-            )
-          : await http.patch(
-              Uri.parse('http://localhost:3000/event/${widget.event!['id']}'),
-              headers: {'Content-Type': 'application/json'},
-              body: jsonEncode(event..removeWhere((key, value) => value == null)),
-            );
+    if (_formKey.currentState?.validate() ?? false) {
+      try {
+        final userId =
+            Provider.of<UserProvider>(context, listen: false).user.id;
+        if (_selectedCategory == null) {
+          throw Exception('Categoria não selecionada');
+        }
+        final event = {
+          'id': widget.event != null ? widget.event!['id'] : null,
+          'name': _nameController.text,
+          'description': _descriptionController.text,
+          'startDate':
+              _parseDateTime(_startDateController.text).toIso8601String(),
+          'endDate': _parseDateTime(_endDateController.text).toIso8601String(),
+          'location': _locationController.text,
+          'categoryId': int.parse(_selectedCategory!),
+          'organizerId': userId,
+          'ticketTypes': ticketTypes,
+          'image4x3': _image4x3Base64,
+          'image16x9': _image16x9Base64,
+        };
+        final response = widget.event == null
+            ? await http.post(
+                Uri.parse('http://localhost:3000/event'),
+                headers: {'Content-Type': 'application/json'},
+                body: jsonEncode(event),
+              )
+            : await http.patch(
+                Uri.parse('http://localhost:3000/event/${widget.event!['id']}'),
+                headers: {'Content-Type': 'application/json'},
+                body: jsonEncode(
+                    event..removeWhere((key, value) => value == null)),
+              );
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        Navigator.pop(context, true);
-      } else {
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          Navigator.pop(context, true);
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Erro ao salvar o evento')),
+          );
+        }
+      } catch (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erro ao salvar o evento')),
+          SnackBar(content: Text('Erro: ${e.toString()}')),
         );
       }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro: ${e.toString()}')),
-      );
     }
   }
-}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white, // Fundo branco da tela
       appBar: AppBar(
-        title: Text(widget.event == null ? 'Criar Evento' : 'Editar Evento'),
+        title: Text(
+          widget.event == null ? 'Criar Evento' : 'Editar Evento',
+          style: TextStyle(
+            color: Colors.black87,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: IconThemeData(color: Colors.black87),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            children: [
-              TextFormField(
-                controller: _nameController,
-                decoration: InputDecoration(labelText: 'Nome'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, insira o nome do evento';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _descriptionController,
-                decoration: InputDecoration(labelText: 'Descrição'),
-                maxLines: null,
-                keyboardType: TextInputType.multiline,
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, insira a descrição do evento';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              GestureDetector(
-                onTap: () => _selectDateTime(context, _startDateController),
-                child: AbsorbPointer(
-                  child: TextFormField(
-                    controller: _startDateController,
-                    decoration: InputDecoration(
-                      labelText: 'Data de Início',
-                      suffixIcon: Icon(Icons.calendar_today),
-                    ),
-                    readOnly: true,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor, insira a data de início';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              GestureDetector(
-                onTap: () => _selectDateTime(context, _endDateController),
-                child: AbsorbPointer(
-                  child: TextFormField(
-                    controller: _endDateController,
-                    decoration: InputDecoration(
-                      labelText: 'Data de Término',
-                      suffixIcon: Icon(Icons.calendar_today),
-                    ),
-                    readOnly: true,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Por favor, insira a data de término';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-              TextFormField(
-                controller: _locationController,
-                decoration: InputDecoration(labelText: 'Localização'),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, insira a localização do evento';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              DropdownButtonFormField<String>(
-                value: _selectedCategory,
-                decoration: InputDecoration(
-                  labelText: 'Categoria',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey[100],
-                ),
-                items: categories.map<DropdownMenuItem<String>>((category) {
-                  return DropdownMenuItem<String>(
-                    value: category['id'].toString(),
-                    child: Text(category['name']),
-                  );
-                }).toList(),
-                onChanged: (value) {
-                  setState(() {
-                    _selectedCategory = value;
-                  });
-                },
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Por favor, selecione uma categoria';
-                  }
-                  return null;
-                },
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Tipos de Ingressos',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              ...ticketTypes.asMap().entries.map((entry) {
-                int index = entry.key;
-                Map<String, dynamic> ticketType = entry.value;
-                return Column(
-                  children: [
-                    TextFormField(
-                      initialValue: ticketType['name'],
-                      decoration:
-                          InputDecoration(labelText: 'Nome do Ingresso'),
-                      onChanged: (value) {
-                        ticketType['name'] = value;
-                      },
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor, insira o nome do ingresso';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 8),
-                    TextFormField(
-                      initialValue: ticketType['price'].toString(),
-                      decoration: InputDecoration(labelText: 'Preço'),
-                      keyboardType: TextInputType.number,
-                      onChanged: (value) {
-                        ticketType['price'] = double.parse(value);
-                      },
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor, insira o preço do ingresso';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 8),
-                    TextFormField(
-                      initialValue: ticketType['totalQuantity'].toString(),
-                      decoration:
-                          InputDecoration(labelText: 'Quantidade Total'),
-                      keyboardType: TextInputType.number,
-                      onChanged: (value) {
-                        ticketType['totalQuantity'] = int.parse(value);
-                      },
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Por favor, insira a quantidade total de ingressos';
-                        }
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 8),
-                    if (newTicketTypes.contains(ticketType))
-                      ElevatedButton(
-                        onPressed: () => _removeNewTicketType(ticketType),
-                        child: Text('Remover Ingresso'),
-                      ),
-                    const SizedBox(height: 16),
-                  ],
-                );
-              }).toList(),
-              ElevatedButton(
-                onPressed: _addTicketType,
-                child: Text('Adicionar Tipo de Ingresso'),
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Imagens do Evento',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Row(
+        child: Card(
+          color: Colors.white, // Cor branca para o Card
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 3,
+          margin: const EdgeInsets.all(8),
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Expanded(
-                    child: Column(
-                      children: [
-                        Text('Imagem 4x3'),
-                        const SizedBox(height: 8),
-                        _image4x3Base64 == null
-                            ? Text('Nenhuma imagem selecionada')
-                            : Image.memory(
-                                base64Decode(_image4x3Base64!),
-                                height: 100,
-                                fit: BoxFit.contain,
-                              ),
-                        const SizedBox(height: 8),
-                        ElevatedButton(
-                          onPressed: () => _pickImage(true),
-                          child: Text('Selecionar Imagem'),
+                  // Nome
+                  TextFormField(
+                    controller: _nameController,
+                    decoration: InputDecoration(
+                      labelText: 'Nome',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, insira o nome do evento';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  // Descrição
+                  TextFormField(
+                    controller: _descriptionController,
+                    decoration: InputDecoration(
+                      labelText: 'Descrição',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    maxLines: null,
+                    keyboardType: TextInputType.multiline,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, insira a descrição do evento';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  // Data de Início
+                  GestureDetector(
+                    onTap: () => _selectDateTime(context, _startDateController),
+                    child: AbsorbPointer(
+                      child: TextFormField(
+                        controller: _startDateController,
+                        decoration: InputDecoration(
+                          labelText: 'Data de Início',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          suffixIcon: Icon(Icons.calendar_today),
                         ),
-                      ],
+                        readOnly: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Por favor, insira a data de início';
+                          }
+                          return null;
+                        },
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      children: [
-                        Text('Imagem 16x9'),
-                        const SizedBox(height: 8),
-                        _image16x9Base64 == null
-                            ? Text('Nenhuma imagem selecionada')
-                            : Image.memory(
-                                base64Decode(_image16x9Base64!),
-                                height: 100,
-                                fit: BoxFit.contain,
-                              ),
-                        const SizedBox(height: 8),
-                        ElevatedButton(
-                          onPressed: () => _pickImage(false),
-                          child: Text('Selecionar Imagem'),
+                  const SizedBox(height: 16),
+                  // Data de Término
+                  GestureDetector(
+                    onTap: () => _selectDateTime(context, _endDateController),
+                    child: AbsorbPointer(
+                      child: TextFormField(
+                        controller: _endDateController,
+                        decoration: InputDecoration(
+                          labelText: 'Data de Término',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          suffixIcon: Icon(Icons.calendar_today),
                         ),
-                      ],
+                        readOnly: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Por favor, insira a data de término';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  // Localização
+                  TextFormField(
+                    controller: _locationController,
+                    decoration: InputDecoration(
+                      labelText: 'Localização',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, insira a localização do evento';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  // Categoria
+                  DropdownButtonFormField<String>(
+                    value: _selectedCategory,
+                    decoration: InputDecoration(
+                      labelText: 'Categoria',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    items: categories.map<DropdownMenuItem<String>>((category) {
+                      return DropdownMenuItem<String>(
+                        value: category['id'].toString(),
+                        child: Text(category['name']),
+                      );
+                    }).toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedCategory = value;
+                      });
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, selecione uma categoria';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  // Tipos de Ingressos
+                  Text(
+                    'Tipos de Ingressos',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  Divider(),
+                  ...ticketTypes.asMap().entries.map((entry) {
+                    int index = entry.key;
+                    Map<String, dynamic> ticketType = entry.value;
+                    return Card(
+                      margin: const EdgeInsets.symmetric(vertical: 8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Cabeçalho do ingresso
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Ingresso ${index + 1}',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                if (newTicketTypes.contains(ticketType))
+                                  IconButton(
+                                    onPressed: () =>
+                                        _removeNewTicketType(ticketType),
+                                    icon: Icon(Icons.delete, color: Colors.red),
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            // Campo para nome
+                            TextFormField(
+                              initialValue: ticketType['name'],
+                              decoration: InputDecoration(
+                                labelText: 'Nome',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              onChanged: (value) {
+                                ticketType['name'] = value;
+                              },
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Por favor, insira o nome do ingresso';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 8),
+                            // Linha com preço e quantidade
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: TextFormField(
+                                    initialValue:
+                                        ticketType['price'].toString(),
+                                    decoration: InputDecoration(
+                                      labelText: 'Preço',
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    keyboardType: TextInputType.number,
+                                    onChanged: (value) {
+                                      ticketType['price'] =
+                                          double.tryParse(value) ?? 0.0;
+                                    },
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Insira o preço';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                ),
+                                const SizedBox(width: 16),
+                                Expanded(
+                                  child: TextFormField(
+                                    initialValue:
+                                        ticketType['totalQuantity'].toString(),
+                                    decoration: InputDecoration(
+                                      labelText: 'Quantidade',
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                    keyboardType: TextInputType.number,
+                                    onChanged: (value) {
+                                      ticketType['totalQuantity'] =
+                                          int.tryParse(value) ?? 0;
+                                    },
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'Insira a quantidade';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                  ElevatedButton(
+                    onPressed: _addTicketType,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      foregroundColor: Colors.white, // Texto branco
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text('Adicionar Tipo de Ingresso'),
+                  ),
+                  const SizedBox(height: 16),
+                  // Imagens do Evento
+                  Text(
+                    'Imagens do Evento',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                  Divider(),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          children: [
+                            Text('Imagem 4x3'),
+                            const SizedBox(height: 8),
+                            Container(
+                              height: 100,
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: _image4x3Base64 == null
+                                  ? Center(child: Text('Nenhuma imagem'))
+                                  : ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Image.memory(
+                                        base64Decode(_image4x3Base64!),
+                                        fit: BoxFit.cover,
+                                        width: double.infinity,
+                                      ),
+                                    ),
+                            ),
+                            const SizedBox(height: 8),
+                            ElevatedButton(
+                              onPressed: () => _pickImage(true),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.black,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: Text('Selecionar'),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          children: [
+                            Text('Imagem 16x9'),
+                            const SizedBox(height: 8),
+                            Container(
+                              height: 100,
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: _image16x9Base64 == null
+                                  ? Center(child: Text('Nenhuma imagem'))
+                                  : ClipRRect(
+                                      borderRadius: BorderRadius.circular(8),
+                                      child: Image.memory(
+                                        base64Decode(_image16x9Base64!),
+                                        fit: BoxFit.cover,
+                                        width: double.infinity,
+                                      ),
+                                    ),
+                            ),
+                            const SizedBox(height: 8),
+                            ElevatedButton(
+                              onPressed: () => _pickImage(false),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.black,
+                                foregroundColor: Colors.white,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: Text('Selecionar'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: _submitForm,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Text(
+                      widget.event == null ? 'Criar Evento' : 'Salvar Evento',
+                      style: TextStyle(fontSize: 16),
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: _submitForm,
-                child: Text(widget.event == null ? 'Criar' : 'Salvar'),
-              ),
-            ],
+            ),
           ),
         ),
       ),
