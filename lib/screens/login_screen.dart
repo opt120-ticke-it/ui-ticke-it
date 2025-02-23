@@ -35,7 +35,8 @@ class _LoginScreenState extends State<LoginScreen> {
         final token = responseData['token'];
         final user = User.fromMap(responseData['user']);
 
-        Provider.of<UserProvider>(context, listen: false).setUserFromModel(user, token: token);
+        Provider.of<UserProvider>(context, listen: false)
+            .setUserFromModel(user, token: token);
 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Login realizado com sucesso!')),
@@ -46,8 +47,16 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       } catch (e) {
         print('Erro no login: $e');
+        String errorMessage =
+            'Ocorreu um erro ao fazer login. Tente novamente.';
+
+        if (e.toString().contains('Credenciais inválidas')) {
+          errorMessage =
+              'Email ou senha inválidos. Por favor, verifique suas informações.';
+        }
+
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString())),
+          SnackBar(content: Text(errorMessage)),
         );
       } finally {
         setState(() {
@@ -64,7 +73,8 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
+            padding:
+                const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -74,10 +84,11 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 16),
                       Text(
                         'Bem-vindo ao ticke.it!',
-                        style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black87,
-                            ),
+                        style:
+                            Theme.of(context).textTheme.headlineSmall?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
                       ),
                       const SizedBox(height: 8),
                       Text(
@@ -125,7 +136,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           prefixIcon: const Icon(Icons.lock_outline),
                           suffixIcon: IconButton(
                             icon: Icon(
-                              _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                              _obscurePassword
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
                               color: Colors.grey,
                             ),
                             onPressed: () {
@@ -202,11 +215,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           GestureDetector(
                             onTap: () {
                               Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => RegisterScreen()
-                                )
-                              );
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => RegisterScreen()));
                             },
                             child: Text(
                               'Cadastre-se',
