@@ -256,7 +256,7 @@ class _EventScreenState extends State<EventScreen> {
   }
 
   void _navigateToPaymentScreen(Map ticketType) {
-    final userId = Provider.of<UserProvider>(context, listen: false).user.id; // Obter o ID do usuário real
+    final userId = Provider.of<UserProvider>(context, listen: false).user.id;
     Navigator.push(
       context,
       MaterialPageRoute(
