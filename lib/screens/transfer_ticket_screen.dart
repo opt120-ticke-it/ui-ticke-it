@@ -1,8 +1,45 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:provider/provider.dart';
 import 'package:ticke_it/providers/user_provider.dart';
+
+// ✅ Criar um formatter para CPF
+class CPFInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    String text = newValue.text.replaceAll(RegExp(r'\D'), '');
+
+    if (text.length > 11) {
+      text = text.substring(0, 11);
+    }
+
+    String formattedText = '';
+    if (text.length > 3) {
+      formattedText = text.substring(0, 3) + '.';
+      if (text.length > 6) {
+        formattedText += text.substring(3, 6) + '.';
+        if (text.length > 9) {
+          formattedText += text.substring(6, 9) + '-';
+          formattedText += text.substring(9);
+        } else {
+          formattedText += text.substring(6);
+        }
+      } else {
+        formattedText += text.substring(3);
+      }
+    } else {
+      formattedText = text;
+    }
+
+    return TextEditingValue(
+      text: formattedText,
+      selection: TextSelection.collapsed(offset: formattedText.length),
+    );
+  }
+}
 
 class TransferTicketScreen extends StatefulWidget {
   final Map ticket;
@@ -14,10 +51,10 @@ class TransferTicketScreen extends StatefulWidget {
 }
 
 class _TransferTicketScreenState extends State<TransferTicketScreen> {
-  final TextEditingController _receiverIdController = TextEditingController();
+  final TextEditingController _receiverCpfController = TextEditingController();
   bool _isTransferring = false;
 
-    Future<void> _showConfirmationDialog() async {
+  Future<void> _showConfirmationDialog() async {
     return showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -38,19 +75,19 @@ class _TransferTicketScreenState extends State<TransferTicketScreen> {
           actions: <Widget>[
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red, // Fundo vermelho
+                backgroundColor: Colors.red,
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               ),
               onPressed: () => Navigator.of(context).pop(),
               child: Text(
                 'Cancelar',
-                style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0), fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green, // Fundo verde
+                backgroundColor: Colors.green,
                 padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               ),
@@ -60,7 +97,7 @@ class _TransferTicketScreenState extends State<TransferTicketScreen> {
               },
               child: Text(
                 'Confirmar',
-                style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0), fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(color: Colors.black, fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -71,12 +108,12 @@ class _TransferTicketScreenState extends State<TransferTicketScreen> {
 
   Future<void> transferTicket() async {
     final originUserId = Provider.of<UserProvider>(context, listen: false).user.id;
-    final destinationUserId = int.tryParse(_receiverIdController.text);
+    final destinationUserCpf = _receiverCpfController.text.trim();
     final ticketId = widget.ticket['id'];
 
-    if (destinationUserId == null) {
+    if (destinationUserCpf.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('ID do usuário inválido.')),
+        SnackBar(content: Text('Digite um CPF válido.')),
       );
       return;
     }
@@ -92,7 +129,7 @@ class _TransferTicketScreenState extends State<TransferTicketScreen> {
         body: json.encode({
           'ticketId': ticketId,
           'originUserId': originUserId,
-          'destinationUserId': destinationUserId,
+          'destinationUserCpf': destinationUserCpf,
         }),
       );
 
@@ -151,10 +188,11 @@ class _TransferTicketScreenState extends State<TransferTicketScreen> {
                     ),
                     SizedBox(height: 10),
                     TextField(
-                      controller: _receiverIdController,
+                      controller: _receiverCpfController,
                       keyboardType: TextInputType.number,
+                      inputFormatters: [CPFInputFormatter()],
                       decoration: InputDecoration(
-                        labelText: 'ID do Usuário Destinatário',
+                        labelText: 'CPF do Usuário Destinatário',
                         labelStyle: TextStyle(color: Colors.black),
                         filled: true,
                         fillColor: Colors.white,
