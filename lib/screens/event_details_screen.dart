@@ -6,7 +6,6 @@ import 'package:http/http.dart' as http;
 import 'package:ticke_it/screens/ticket_validation_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:ticke_it/providers/user_provider.dart';
-import 'package:ticke_it/screens/pagament_screen.dart';
 
 class EventDetailsScreen extends StatefulWidget {
   final int eventId;
