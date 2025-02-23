@@ -28,7 +28,6 @@ class _MyTicketsScreenState extends State<MyTicketsScreen> {
     final response =
         await http.get(Uri.parse('http://localhost:3000/user/$userId/tickets'));
     if (response.statusCode == 200) {
-      print('Dados dos tickets: ${response.body}');
       setState(() {
         tickets = json.decode(response.body);
         isLoading = false;

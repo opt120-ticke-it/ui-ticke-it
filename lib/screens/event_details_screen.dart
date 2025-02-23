@@ -54,7 +54,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   void _navigateToQrcodeScannerScreen() {
     final userId = Provider.of<UserProvider>(context, listen: false)
         .user
-        .id; // Obter o ID do usuário real
+        .id;
     Navigator.push(
       context,
       MaterialPageRoute(
