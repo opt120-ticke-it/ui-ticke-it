@@ -37,6 +37,7 @@ dependencies:
   flutter_masked_text2: ^0.9.1
   flutter_date_pickers: ^0.4.0
   qr_flutter: ^4.0.0
+  qr_code_scanner_plus: ^2.0.10+1
 
 dev_dependencies:
   flutter_test:

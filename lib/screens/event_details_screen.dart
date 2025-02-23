@@ -3,6 +3,10 @@ import 'package:ticke_it/screens/event_form_screen.dart';
 import 'dart:convert';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:ticke_it/screens/ticket_validation_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:ticke_it/providers/user_provider.dart';
+import 'package:ticke_it/screens/pagament_screen.dart';
 
 class EventDetailsScreen extends StatefulWidget {
   final int eventId;
@@ -24,7 +28,8 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   }
 
   Future<void> fetchEventDetails() async {
-    final response = await http.get(Uri.parse('http://localhost:3000/event/${widget.eventId}'));
+    final response = await http
+        .get(Uri.parse('http://localhost:3000/event/${widget.eventId}'));
     if (response.statusCode == 200) {
       setState(() {
         event = json.decode(response.body);
@@ -47,6 +52,23 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
     }
   }
 
+  void _navigateToQrcodeScannerScreen() {
+    final userId = Provider.of<UserProvider>(context, listen: false)
+        .user
+        .id; // Obter o ID do usuário real
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => QRScannerScreen(
+          data: {
+            'userId': userId,
+            'event': event,
+          },
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final image4x3 = event['images']?.firstWhere(
@@ -59,8 +81,12 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
     );
 
     final DateFormat formatter = DateFormat('dd/MM/yyyy HH:mm');
-    final String formattedStartDate = event.isNotEmpty ? formatter.format(DateTime.parse(event['startDate'])) : '';
-    final String formattedEndDate = event.isNotEmpty ? formatter.format(DateTime.parse(event['endDate'])) : '';
+    final String formattedStartDate = event.isNotEmpty
+        ? formatter.format(DateTime.parse(event['startDate']))
+        : '';
+    final String formattedEndDate = event.isNotEmpty
+        ? formatter.format(DateTime.parse(event['endDate']))
+        : '';
 
     return Scaffold(
       appBar: AppBar(
@@ -135,7 +161,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                       ),
                       ElevatedButton(
                         onPressed: () {
-                          // Função de validar ingresso será implementada mais tarde
+                          _navigateToQrcodeScannerScreen();
                         },
                         child: Text('Validar Ingresso'),
                       ),
