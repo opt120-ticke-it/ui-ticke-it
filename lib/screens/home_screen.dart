@@ -56,9 +56,6 @@ class _HomeScreenState extends State<HomeScreen> {
         onMenuPressed: () {
           widget.scaffoldKey.currentState?.openDrawer();
         },
-        onCartPressed: () {
-          print('Carrinho pressionado');
-        },
         onTitlePressed:
             fetchCategories, // Adicionado para recarregar a página inicial
       ),
