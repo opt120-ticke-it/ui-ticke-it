@@ -27,8 +27,9 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   }
 
   Future<void> fetchEventDetails() async {
-    final response = await http
-        .get(Uri.parse('http://localhost:3000/event/${widget.eventId}'));
+    final response = await http.get(
+      Uri.parse('http://localhost:3000/event/${widget.eventId}'),
+    );
     if (response.statusCode == 200) {
       setState(() {
         event = json.decode(response.body);
@@ -52,9 +53,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
   }
 
   void _navigateToQrcodeScannerScreen() {
-    final userId = Provider.of<UserProvider>(context, listen: false)
-        .user
-        .id;
+    final userId = Provider.of<UserProvider>(context, listen: false).user.id;
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -68,12 +67,29 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
     );
   }
 
+  Widget _buildDetailRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '$label ',
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: TextStyle(fontSize: 16),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final image4x3 = event['images']?.firstWhere(
-      (image) => image['type'] == '4x3',
-      orElse: () => null,
-    );
     final image16x9 = event['images']?.firstWhere(
       (image) => image['type'] == '16x9',
       orElse: () => null,
@@ -90,67 +106,73 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Detalhes do Evento'),
+        centerTitle: true,
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
-          : Padding(
+          : SingleChildScrollView(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(
-                    height: 200,
-                    width: double.infinity,
-                    color: Colors.grey.shade200,
-                    child: image4x3 == null
-                        ? Center(child: Text('Sem imagem'))
-                        : Image.memory(
-                            base64Decode(image4x3['base64']),
-                            fit: BoxFit.contain,
+                  // Imagem do evento em formato 16x9
+                  Card(
+                    elevation: 5,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    clipBehavior: Clip.antiAlias,
+                    child: Container(
+                      height: 200,
+                      width: double.infinity,
+                      color: Colors.grey.shade200,
+                      child: image16x9 == null
+                          ? Center(child: Text('Sem imagem'))
+                          : Image.memory(
+                              base64Decode(image16x9['base64']),
+                              fit: BoxFit.cover,
+                            ),
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  // Dados do evento
+                  Card(
+                    elevation: 3,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            event['name'] ?? '',
+                            style: TextStyle(
+                                fontSize: 24, fontWeight: FontWeight.bold),
                           ),
-                  ),
-                  SizedBox(height: 16.0),
-                  Container(
-                    height: 200,
-                    width: double.infinity,
-                    color: Colors.grey.shade200,
-                    child: image16x9 == null
-                        ? Center(child: Text('Sem imagem'))
-                        : Image.memory(
-                            base64Decode(image16x9['base64']),
-                            fit: BoxFit.contain,
+                          Divider(height: 20, thickness: 1),
+                          _buildDetailRow('Início:', formattedStartDate),
+                          _buildDetailRow('Término:', formattedEndDate),
+                          _buildDetailRow('Local:', event['location'] ?? ''),
+                          SizedBox(height: 8),
+                          Text(
+                            'Descrição:',
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.bold),
                           ),
+                          SizedBox(height: 4),
+                          Text(
+                            event['description'] ?? '',
+                            style: TextStyle(
+                                fontSize: 16, color: Colors.grey[600]),
+                          ),
+                        ],
+                      ),
+                    ),
                   ),
-                  SizedBox(height: 16.0),
-                  Text(
-                    event['name'],
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                  ),
-                  SizedBox(height: 8.0),
-                  Text(
-                    'Data de Início: $formattedStartDate',
-                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-                  ),
-                  SizedBox(height: 8.0),
-                  Text(
-                    'Data de Término: $formattedEndDate',
-                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-                  ),
-                  SizedBox(height: 8.0),
-                  Text(
-                    'Local: ${event['location']}',
-                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-                  ),
-                  SizedBox(height: 8.0),
-                  Text(
-                    'Descrição:',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  ),
-                  Text(
-                    event['description'],
-                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-                  ),
-                  Spacer(),
+                  SizedBox(height: 24),
+                  // Botões de ação
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
@@ -159,9 +181,7 @@ class _EventDetailsScreenState extends State<EventDetailsScreen> {
                         child: Text('Editar Evento'),
                       ),
                       ElevatedButton(
-                        onPressed: () {
-                          _navigateToQrcodeScannerScreen();
-                        },
+                        onPressed: _navigateToQrcodeScannerScreen,
                         child: Text('Validar Ingresso'),
                       ),
                     ],

@@ -190,14 +190,9 @@ class _EventFormScreenState extends State<EventFormScreen> {
       appBar: AppBar(
         title: Text(
           widget.event == null ? 'Criar Evento' : 'Editar Evento',
-          style: TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.bold,
-          ),
         ),
-        backgroundColor: Colors.white,
         elevation: 0,
-        iconTheme: IconThemeData(color: Colors.black87),
+        iconTheme: IconThemeData(color: Colors.white),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),

@@ -43,20 +43,11 @@ class _MyTicketsScreenState extends State<MyTicketsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.white,
-        title: Text(
-          'Meus Ingressos',
-          style: TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: Text('Meus Ingressos'),
         actions: [
           IconButton(
-            icon: Icon(Icons.refresh, color: Colors.black87),
+            icon: Icon(Icons.refresh),
             onPressed: fetchTickets,
           ),
         ],

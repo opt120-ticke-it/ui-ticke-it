@@ -28,7 +28,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> fetchUserProfile() async {
     final userId = Provider.of<UserProvider>(context, listen: false).user.id;
-    final response = await http.get(Uri.parse('http://localhost:3000/user/$userId'));
+    final response =
+        await http.get(Uri.parse('http://localhost:3000/user/$userId'));
     if (response.statusCode == 200) {
       final user = json.decode(response.body);
       setState(() {
@@ -85,53 +86,57 @@ class _ProfileScreenState extends State<ProfileScreen> {
           title: Text('Alterar Perfil'),
           content: Form(
             key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextFormField(
-                  controller: _nameController,
-                  decoration: InputDecoration(labelText: 'Nome'),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Por favor, insira seu nome';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _emailController,
-                  decoration: InputDecoration(labelText: 'Email'),
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Por favor, insira seu email';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                DropdownButtonFormField<String>(
-                  value: _genderController.text,
-                  decoration: InputDecoration(labelText: 'Gênero'),
-                  items: ['Masculino', 'Feminino'].map((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
-                  onChanged: (newValue) {
-                    setState(() {
-                      _genderController.text = newValue!;
-                    });
-                  },
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Por favor, selecione seu gênero';
-                    }
-                    return null;
-                  },
-                ),
-              ],
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    controller: _nameController,
+                    decoration: InputDecoration(labelText: 'Nome'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, insira seu nome';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _emailController,
+                    decoration: InputDecoration(labelText: 'Email'),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, insira seu email';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  DropdownButtonFormField<String>(
+                    value: _genderController.text.isNotEmpty
+                        ? _genderController.text
+                        : null,
+                    decoration: InputDecoration(labelText: 'Gênero'),
+                    items: ['Masculino', 'Feminino'].map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                    onChanged: (newValue) {
+                      setState(() {
+                        _genderController.text = newValue!;
+                      });
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, selecione seu gênero';
+                      }
+                      return null;
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
           actions: [
@@ -150,9 +155,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _showChangePasswordDialog() {
-    final TextEditingController _currentPasswordController = TextEditingController();
-    final TextEditingController _newPasswordController = TextEditingController();
-    final TextEditingController _confirmPasswordController = TextEditingController();
+    final TextEditingController _currentPasswordController =
+        TextEditingController();
+    final TextEditingController _newPasswordController =
+        TextEditingController();
+    final TextEditingController _confirmPasswordController =
+        TextEditingController();
 
     showDialog(
       context: context,
@@ -161,45 +169,48 @@ class _ProfileScreenState extends State<ProfileScreen> {
           title: Text('Alterar Senha'),
           content: Form(
             key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextFormField(
-                  controller: _currentPasswordController,
-                  decoration: InputDecoration(labelText: 'Senha Atual'),
-                  obscureText: true,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Por favor, insira sua senha atual';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _newPasswordController,
-                  decoration: InputDecoration(labelText: 'Nova Senha'),
-                  obscureText: true,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Por favor, insira sua nova senha';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 16),
-                TextFormField(
-                  controller: _confirmPasswordController,
-                  decoration: InputDecoration(labelText: 'Confirmar Nova Senha'),
-                  obscureText: true,
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Por favor, confirme sua nova senha';
-                    }
-                    return null;
-                  },
-                ),
-              ],
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    controller: _currentPasswordController,
+                    decoration: InputDecoration(labelText: 'Senha Atual'),
+                    obscureText: true,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, insira sua senha atual';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _newPasswordController,
+                    decoration: InputDecoration(labelText: 'Nova Senha'),
+                    obscureText: true,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, insira sua nova senha';
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _confirmPasswordController,
+                    decoration:
+                        InputDecoration(labelText: 'Confirmar Nova Senha'),
+                    obscureText: true,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Por favor, confirme sua nova senha';
+                      }
+                      return null;
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
           actions: [
@@ -209,8 +220,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             ElevatedButton(
               onPressed: () {
-                if (_newPasswordController.text == _confirmPasswordController.text) {
-                  _updateUser(password: _newPasswordController.text, oldPassword: _currentPasswordController.text);
+                if (_newPasswordController.text ==
+                    _confirmPasswordController.text) {
+                  _updateUser(
+                    password: _newPasswordController.text,
+                    oldPassword: _currentPasswordController.text,
+                  );
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('As senhas não coincidem')),
@@ -225,69 +240,99 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Widget _buildProfileRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4.0),
+      child: Row(
+        children: [
+          Expanded(
+            flex: 3,
+            child: Text(
+              label,
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ),
+          Expanded(
+            flex: 5,
+            child: Text(
+              value,
+              style: TextStyle(fontSize: 16),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Perfil'),
+        centerTitle: true,
       ),
       body: isLoading
           ? Center(child: CircularProgressIndicator())
           : hasError
               ? Center(child: Text('Erro ao carregar perfil'))
-              : Padding(
+              : SingleChildScrollView(
                   padding: const EdgeInsets.all(16.0),
-                  child: Center(
-                    child: Container(
-                      padding: const EdgeInsets.all(16.0),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.5),
-                            spreadRadius: 5,
-                            blurRadius: 7,
-                            offset: Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.person, size: 100, color: Colors.grey),
-                          const SizedBox(height: 16),
-                          Text('Nome:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                          Text(_nameController.text, style: TextStyle(fontSize: 18)),
-                          const SizedBox(height: 16),
-                          Text('Email:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                          Text(_emailController.text, style: TextStyle(fontSize: 18)),
-                          const SizedBox(height: 16),
-                          Text('CPF:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                          Text(_cpf ?? '', style: TextStyle(fontSize: 18)),
-                          const SizedBox(height: 16),
-                          Text('Data de Nascimento:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                          Text(_birthDate != null ? DateFormat('dd/MM/yyyy').format(_birthDate!) : '', style: TextStyle(fontSize: 18)),
-                          const SizedBox(height: 16),
-                          Text('Gênero:', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                          Text(_genderController.text, style: TextStyle(fontSize: 18)),
-                          const SizedBox(height: 24),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  child: Column(
+                    children: [
+                      Card(
+                        elevation: 5,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 24.0, horizontal: 16.0),
+                          child: Column(
                             children: [
-                              ElevatedButton(
-                                onPressed: _showEditProfileDialog,
-                                child: Text('Alterar Perfil'),
+                              CircleAvatar(
+                                radius: 50,
+                                backgroundColor: Colors.grey[200],
+                                child: Icon(
+                                  Icons.person,
+                                  size: 50,
+                                  color: Colors.grey,
+                                ),
                               ),
-                              ElevatedButton(
-                                onPressed: _showChangePasswordDialog,
-                                child: Text('Alterar Senha'),
-                              ),
+                              const SizedBox(height: 16),
+                              _buildProfileRow('Nome:', _nameController.text),
+                              Divider(),
+                              _buildProfileRow('Email:', _emailController.text),
+                              Divider(),
+                              _buildProfileRow('CPF:', _cpf ?? ''),
+                              Divider(),
+                              _buildProfileRow(
+                                  'Data de Nascimento:',
+                                  _birthDate != null
+                                      ? DateFormat('dd/MM/yyyy')
+                                          .format(_birthDate!)
+                                      : ''),
+                              Divider(),
+                              _buildProfileRow(
+                                  'Gênero:', _genderController.text),
                             ],
                           ),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          ElevatedButton(
+                            onPressed: _showEditProfileDialog,
+                            child: Text('Alterar Perfil'),
+                          ),
+                          ElevatedButton(
+                            onPressed: _showChangePasswordDialog,
+                            child: Text('Alterar Senha'),
+                          ),
                         ],
                       ),
-                    ),
+                    ],
                   ),
                 ),
     );
